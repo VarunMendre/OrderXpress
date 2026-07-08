@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>OrderXpress Admin | Real-time Orders</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .status-pulse {
+            animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse-ring {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .5; }
+        }
+        .order-card-transition {
+            transition: all 0.2s ease-in-out;
+        }
+        /* Custom scrollbar for clean UI */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #bccac0;
+            border-radius: 10px;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary-container": "#0b3877",
+                        "secondary": "#5d5e64",
+                        "on-tertiary-fixed-variant": "#74340b",
+                        "surface": "#FFFFFF",
+                        "inverse-primary": "#adc6ff",
+                        "surface-bright": "#faf9ff",
+                        "on-tertiary": "#ffffff",
+                        "border": "#EDEEF1",
+                        "success": "#358F6C",
+                        "warning": "#f97316",
+                        "accent-blue-tint": "#EAF2FF",
+                        "on-tertiary-container": "#e68e5e",
+                        "background": "#F7F8FA",
+                        "on-primary": "#ffffff",
+                        "on-secondary-container": "#616269",
+                        "on-error": "#ffffff",
+                        "on-surface": "#1a1b20",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-tint": "#3a5d9e",
+                        "on-secondary-fixed-variant": "#45474c",
+                        "tertiary-fixed": "#ffdbcb",
+                        "on-secondary-fixed": "#1a1b21",
+                        "tertiary-fixed-dim": "#ffb690",
+                        "success-container": "#E7F7EF",
+                        "primary-fixed-dim": "#adc6ff",
+                        "inverse-on-surface": "#f1f0f6",
+                        "error-container": "#ffdad6",
+                        "outline-variant": "#c4c6d2",
+                        "primary-fixed": "#d8e2ff",
+                        "surface-container-highest": "#e2e2e8",
+                        "surface-container-high": "#e8e7ee",
+                        "tertiary": "#421800",
+                        "secondary-container": "#dfdfe6",
+                        "tertiary-container": "#642800",
+                        "text-secondary": "#7A7F8A",
+                        "on-primary-fixed": "#001a41",
+                        "surface-variant": "#e2e2e8",
+                        "inverse-surface": "#2f3035",
+                        "surface-container": "#eeedf3",
+                        "on-tertiary-fixed": "#341100",
+                        "text-primary": "#111318",
+                        "error": "#E5484D",
+                        "surface-container-low": "#f4f3f9",
+                        "secondary-fixed": "#e2e2e9",
+                        "on-background": "#1a1b20",
+                        "primary": "#002353",
+                        "on-primary-fixed-variant": "#1f4584",
+                        "on-surface-variant": "#434750",
+                        "on-secondary": "#ffffff",
+                        "warning-container": "#fff7ed",
+                        "on-primary-container": "#82a4e9",
+                        "on-error-container": "#93000a",
+                        "outline": "#747781",
+                        "surface-dim": "#dad9df"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-mobile": "16px",
+                        "base": "4px",
+                        "gutter": "16px",
+                        "sm": "8px",
+                        "margin-desktop": "24px",
+                        "xs": "4px",
+                        "xl": "32px",
+                        "lg": "24px",
+                        "md": "16px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Inter"],
+                        "label-md": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "title-md": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "body-sm": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                        "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "title-md": ["18px", {"lineHeight": "24px", "fontWeight": "600"}],
+                        "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                        "body-sm": ["13px", {"lineHeight": "18px", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background min-h-screen pb-24 md:pb-0 font-body-lg" style="background-color: #F9FAFB;">
+<!-- TopAppBar -->
+<header class="bg-surface/80 backdrop-blur-md shadow-sm fixed top-0 w-full px-margin-mobile h-16 z-50 flex justify-between items-center">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary text-2xl" data-icon="speed">speed</span>
+<h1 class="font-headline-lg-mobile text-primary tracking-tight">OrderXpress</h1>
+</div>
+<div class="flex items-center gap-md">
+<div class="relative p-2">
+<span class="material-symbols-outlined text-on-surface-variant text-2xl" data-icon="notifications">notifications</span>
+<span class="absolute top-2 right-2 flex h-2.5 w-2.5">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-error opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-error"></span>
+</span>
+</div>
+<div class="w-9 h-9 rounded-full border border-outline-variant overflow-hidden active:scale-95 transition-transform">
+<img alt="Manager Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDt7Z4cdT02Yy6TDMOq6pDQ8VS-wLVWcwJ2xGdZ85ndeK_nsH9mVPp89j8TE28iVAl1_sUIwKujVGB5uXB3jw3e9S2ckY8JblM8mveiOLVNXyiJKztZkz0bba2Uvf9m0Fa4wp7MRNaKFnVSxqA842lzyjJanlXXXpyyeyoXXkc0e2Pg0J05Hs0PJHu4ptOCC4V_KrIR6i48qi0_quw0IuTjslXXCP5oGtWNPLh0_iAFE4ysD3E-Basz"/>
+</div>
+</div>
+</header>
+<main class="max-w-7xl mx-auto px-margin-mobile pt-24 pb-lg">
+<!-- Admin Dashboard Header -->
+<div class="flex flex-col md:flex-row md:items-end justify-between mb-lg gap-md">
+<div>
+<h2 class="font-headline-lg-mobile text-on-surface">Real-time Orders</h2>
+<div class="flex items-center gap-2 mt-1"><span class="material-symbols-outlined text-success text-sm animate-pulse">sensors</span><span class="font-label-md text-success uppercase tracking-widest text-[11px]">Kitchen Live</span></div>
+</div>
+<!-- Search & Filters -->
+<div class="flex items-center gap-sm w-full md:w-auto">
+<div class="relative flex-1 md:w-72">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-xl">search</span>
+<input class="w-full pl-10 pr-4 h-11 bg-surface border border-outline-variant rounded-xl focus:ring-1 focus:ring-primary focus:border-primary transition-all outline-none text-body-sm" placeholder="Table or Order ID..." type="text"/>
+</div>
+<button class="h-11 w-11 flex items-center justify-center bg-surface border border-outline-variant rounded-xl hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="tune">tune</span>
+</button>
+</div>
+</div>
+<!-- Stats Overview -->
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-gutter mb-xl"><div class="bg-surface p-5 rounded-xl border border-outline-variant/20 shadow-sm flex flex-col gap-2"><span class="text-[10px] font-bold text-text-secondary uppercase tracking-widest">New Orders</span><div class="flex items-baseline gap-2"><span class="text-3xl font-bold text-primary tracking-tight">08</span><span class="text-[10px] font-semibold text-primary bg-primary/5 px-2 py-0.5 rounded-full">+2 New</span></div></div><div class="bg-surface p-5 rounded-xl border border-outline-variant/20 shadow-sm flex flex-col gap-2"><span class="text-[10px] font-bold text-text-secondary uppercase tracking-widest">Preparing</span><div class="flex items-baseline gap-2"><span class="text-3xl font-bold text-warning tracking-tight">14</span><span class="text-[10px] font-semibold text-warning bg-warning/5 px-2 py-0.5 rounded-full">3 Rush</span></div></div><div class="bg-surface p-5 rounded-xl border border-outline-variant/20 shadow-sm flex flex-col gap-2"><span class="text-[10px] font-bold text-text-secondary uppercase tracking-widest">Ready</span><div class="flex items-baseline gap-2"><span class="text-3xl font-bold text-success tracking-tight">05</span><span class="text-[10px] font-semibold text-success bg-success/5 px-2 py-0.5 rounded-full">Avg 12m</span></div></div><div class="bg-surface p-5 rounded-xl border border-outline-variant/20 shadow-sm flex flex-col gap-2"><span class="text-[10px] font-bold text-text-secondary uppercase tracking-widest">Revenue</span><div class="flex items-baseline gap-2"><span class="text-3xl font-bold text-on-surface tracking-tight">₹12.4k</span><span class="text-[10px] font-semibold text-success bg-success/5 px-2 py-0.5 rounded-full">+15%</span></div></div></div>
+<!-- Orders List -->
+<div class="flex flex-col gap-6">
+<!-- Order Card 1: Preparing -->
+<div class="bg-surface p-6 rounded-xl border border-outline-variant/10 shadow-sm hover:shadow-md transition-all cursor-pointer"><div class="flex justify-between items-start mb-6"><div class="flex flex-col gap-1"><div class="flex items-center gap-2"><span class="text-sm font-bold text-primary">T-12</span><span class="text-sm font-semibold text-on-surface">Order #8842</span></div><p class="text-xs text-text-secondary font-medium">4 items • Placed 12m ago</p></div><span class="px-3 py-1 rounded-[8px] text-[10px] font-bold uppercase tracking-widest bg-warning/10 text-warning border border-warning/20">Preparing</span></div><div class="space-y-3 mb-8"><div class="flex justify-between items-center"><span class="text-sm font-medium text-on-surface">1x Wagyu Truffle Burger</span><span class="text-[11px] font-bold text-success">Ready</span></div><div class="flex justify-between items-center"><span class="text-sm font-medium text-on-surface">2x Crispy Calamari</span><span class="text-[11px] font-medium text-text-secondary italic">Preparing...</span></div><p class="text-[11px] font-medium text-text-secondary">+ 1 more item</p></div><div class="flex items-center justify-between pt-5 border-t border-outline-variant/10"><div><p class="text-[10px] uppercase font-bold text-text-secondary tracking-widest">Total Amount</p><p class="text-xl font-bold text-on-surface">₹142.50</p></div><button class="bg-primary text-white h-11 px-6 rounded-lg text-xs font-bold hover:bg-primary-container active:scale-95 transition-all shadow-sm">Update Status</button></div></div>
+<!-- Order Card 2: New -->
+<div class="bg-surface p-6 rounded-xl border border-outline-variant/10 border-l-4 border-l-primary shadow-sm hover:shadow-md transition-all cursor-pointer"><div class="flex justify-between items-start mb-6"><div class="flex flex-col gap-1"><div class="flex items-center gap-2"><span class="text-sm font-bold text-primary">T-05</span><span class="text-sm font-semibold text-on-surface">Order #8845</span></div><p class="text-xs text-text-secondary font-medium">2 items • Placed 2m ago</p></div><span class="px-3 py-1 rounded-[8px] text-[10px] font-bold uppercase tracking-widest bg-primary text-white">New</span></div><div class="space-y-3 mb-8"><div class="flex justify-between items-center"><span class="text-sm font-medium text-on-surface">3x Artisan Sourdough Toast</span></div></div><div class="flex items-center justify-between pt-5 border-t border-outline-variant/10"><div><p class="text-[10px] uppercase font-bold text-text-secondary tracking-widest">Total Amount</p><p class="text-xl font-bold text-on-surface">₹58.00</p></div><button class="bg-primary text-white h-11 px-6 rounded-lg text-xs font-bold hover:bg-primary-container active:scale-95 transition-all shadow-sm">Update Status</button></div></div>
+<!-- Order Card 3: Ready -->
+<div class="bg-surface p-6 rounded-xl border border-outline-variant/10 shadow-sm hover:shadow-md transition-all cursor-pointer"><div class="flex justify-between items-start mb-6"><div class="flex flex-col gap-1"><div class="flex items-center gap-2"><span class="text-sm font-bold text-success">T-22</span><span class="text-sm font-semibold text-on-surface">Order #8840</span></div><p class="text-xs text-text-secondary font-medium">1 item • Ready for 5m</p></div><span class="px-3 py-1 rounded-[8px] text-[10px] font-bold uppercase tracking-widest bg-success/10 text-success border border-success/20">Ready</span></div><div class="space-y-3 mb-8"><div class="flex justify-between items-center"><span class="text-sm font-medium text-text-secondary line-through">1x Chef's Tasting Platter (Large)</span></div></div><div class="flex items-center justify-between pt-5 border-t border-outline-variant/10"><div><p class="text-[10px] uppercase font-bold text-text-secondary tracking-widest">Total Amount</p><p class="text-xl font-bold text-on-surface">₹85.00</p></div><button class="bg-primary text-white h-11 px-6 rounded-lg text-xs font-bold hover:bg-primary-container active:scale-95 transition-all shadow-sm">Update Status</button></div></div>
+</div>
+</main>
+<!-- Bottom NavBar (Matching standard COMPONENTS_5) -->
+<nav class="md:hidden fixed bottom-0 w-full z-50 flex justify-around items-center px-4 py-2 pb-safe bg-surface/90 backdrop-blur-xl border-t border-outline-variant/20 shadow-[0_-4px_12px_rgba(0,0,0,0.05)]">
+<button class="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container rounded-full px-5 py-1.5 active:scale-90 transition-all duration-200">
+<span class="material-symbols-outlined" data-icon="receipt_long">receipt_long</span>
+<span class="font-label-md text-[10px]">Orders</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant px-5 py-1.5 active:scale-90 transition-all duration-200">
+<span class="material-symbols-outlined" data-icon="edit_note">edit_note</span>
+<span class="font-label-md text-[10px]">Menu</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant px-5 py-1.5 active:scale-90 transition-all duration-200">
+<span class="material-symbols-outlined" data-icon="insert_chart">insert_chart</span>
+<span class="font-label-md text-[10px]">Reports</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant px-5 py-1.5 active:scale-90 transition-all duration-200">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-label-md text-[10px]">Settings</span>
+</button>
+</nav>
+<!-- Desktop Navigation Drawer -->
+<aside class="hidden md:flex fixed left-0 top-0 h-screen w-80 flex-col p-md bg-surface shadow-2xl z-[60] border-r border-outline-variant/10">
+<div class="mb-xl flex items-center gap-md px-base">
+<div class="w-12 h-12 bg-primary rounded-xl flex items-center justify-center text-on-primary">
+<span class="material-symbols-outlined text-2xl" data-icon="speed">speed</span>
+</div>
+<div>
+<h2 class="font-title-md text-primary">OrderXpress</h2>
+<p class="font-label-md text-on-surface-variant">Admin Terminal</p>
+</div>
+</div>
+<nav class="flex-1 space-y-2">
+<a class="flex items-center gap-md p-md bg-primary-container text-on-primary-container font-semibold rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="receipt_long">receipt_long</span>
+<span class="font-body-lg">Active Orders</span>
+</a>
+<a class="flex items-center gap-md p-md text-on-surface-variant hover:bg-surface-container-low rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="history">history</span>
+<span class="font-body-lg">Order History</span>
+</a>
+<a class="flex items-center gap-md p-md text-on-surface-variant hover:bg-surface-container-low rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="inventory_2">inventory_2</span>
+<span class="font-body-lg">Menu Management</span>
+</a>
+</nav>
+<div class="mt-auto p-md bg-surface-container-low rounded-xl">
+<div class="flex items-center justify-between mb-2">
+<span class="font-label-md text-on-surface-variant">System Load</span>
+<span class="font-label-md text-success">Optimal</span>
+</div>
+<div class="w-full bg-outline-variant/30 h-1.5 rounded-full overflow-hidden">
+<div class="bg-success h-full w-[45%]"></div>
+</div>
+<p class="text-[10px] text-on-surface-variant mt-2 uppercase tracking-widest">Server ID: OX-992</p>
+</div>
+</aside>
+<!-- Floating Action Button -->
+<button class="fixed bottom-28 right-6 md:bottom-12 md:right-12 w-14 h-14 bg-primary text-on-primary rounded-full shadow-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all z-40">
+<span class="material-symbols-outlined text-3xl">add</span>
+</button>
+<script>
+    // Simulate toast notification
+    setTimeout(() => {
+        const toast = document.createElement('div');
+        toast.className = 'fixed top-20 right-6 z-[100] bg-inverse-surface text-inverse-on-surface px-6 py-4 rounded-xl shadow-2xl transform translate-x-full transition-transform duration-500 flex items-center gap-4';
+        toast.innerHTML = `
+            <span class="material-symbols-outlined text-success">check_circle</span>
+            <div>
+                <p class="font-semibold">New Order Received</p>
+                <p class="text-sm opacity-80">Table #14 • 3 Items</p>
+            </div>
+        `;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.style.transform = 'translateX(0)', 100);
+        setTimeout(() => {
+            toast.style.transform = 'translateX(calc(100% + 24px))';
+            setTimeout(() => toast.remove(), 500);
+        }, 5000);
+    }, 2000);
+</script>
+</body></html>

@@ -1,0 +1,15 @@
+{
+  "name": "orderxpress",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "admin/*",
+    "customer/*",
+    "shared/*"
+  ],
+  "scripts": {
+    "dev": "echo \"Define per-app dev scripts after the first app is scaffolded.\"",
+    "build": "echo \"Build scripts will be added per package.\"",
+    "lint": "echo \"Lint scripts will be added per package.\""
+  }
+}

@@ -1,0 +1,275 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport">
+<title>OrderXpress Admin Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary": "#002353",
+                        "primary-container": "#0b3877",
+                        "secondary": "#5d5e64",
+                        "on-tertiary-fixed-variant": "#74340b",
+                        "surface": "#FFFFFF",
+                        "inverse-primary": "#adc6ff",
+                        "surface-bright": "#faf9ff",
+                        "on-tertiary": "#ffffff",
+                        "border": "#EDEEF1",
+                        "success": "#358F6C",
+                        "warning": "#BA864C",
+                        "accent-blue-tint": "#EAF2FF",
+                        "on-tertiary-container": "#e68e5e",
+                        "background": "#F7F8FA",
+                        "on-primary": "#ffffff",
+                        "on-secondary-container": "#616269",
+                        "on-error": "#ffffff",
+                        "on-surface": "#1a1b20",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-tint": "#3a5d9e",
+                        "on-secondary-fixed-variant": "#45474c",
+                        "tertiary-fixed": "#ffdbcb",
+                        "on-secondary-fixed": "#1a1b21",
+                        "tertiary-fixed-dim": "#ffb690",
+                        "success-container": "#E7F7EF",
+                        "primary-fixed-dim": "#adc6ff",
+                        "inverse-on-surface": "#f1f0f6",
+                        "error-container": "#ffdad6",
+                        "outline-variant": "#c4c6d2",
+                        "primary-fixed": "#d8e2ff",
+                        "surface-container-highest": "#e2e2e8",
+                        "surface-container-high": "#e8e7ee",
+                        "tertiary": "#421800",
+                        "secondary-container": "#dfdfe6",
+                        "tertiary-container": "#642800",
+                        "text-secondary": "#7A7F8A",
+                        "on-primary-fixed": "#001a41",
+                        "surface-variant": "#e2e2e8",
+                        "inverse-surface": "#2f3035",
+                        "surface-container": "#eeedf3",
+                        "on-tertiary-fixed": "#341100",
+                        "text-primary": "#111318",
+                        "error": "#E5484D",
+                        "surface-container-low": "#f4f3f9",
+                        "secondary-fixed": "#e2e2e9",
+                        "on-background": "#1a1b20",
+                        "on-primary-fixed-variant": "#1f4584",
+                        "on-surface-variant": "#434750",
+                        "on-secondary": "#ffffff",
+                        "warning-container": "#FDECD9",
+                        "on-primary-container": "#82a4e9",
+                        "on-error-container": "#93000a",
+                        "outline": "#747781",
+                        "surface-dim": "#dad9df"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-desktop": "24px",
+                        "gutter": "16px",
+                        "stack-sm": "8px",
+                        "card-padding": "16px",
+                        "margin-mobile": "16px",
+                        "stack-md": "16px"
+                    },
+                    "fontFamily": {
+                        "body-sm": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "headline-sm": ["Inter"],
+                        "micro": ["Inter"],
+                        "label-md": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "label-sm": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-sm": ["12px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "headline-md": ["20px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                        "headline-sm": ["16px", {"lineHeight": "1.4", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                        "micro": ["11px", {"lineHeight": "1.4", "fontWeight": "400"}],
+                        "label-md": ["12px", {"lineHeight": "1", "fontWeight": "600"}],
+                        "body-md": ["13px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "headline-lg": ["24px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "label-sm": ["11px", {"lineHeight": "1", "fontWeight": "500"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-card {
+            background: #FFFFFF;
+            border: 1px solid #EDEEF1;
+        }
+        .chart-bar {
+            @apply bg-primary/20 rounded-t-sm transition-all duration-500 ease-out;
+        }
+        .chart-bar-active {
+            @apply bg-primary rounded-t-sm;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface min-h-screen pb-24">
+<!-- TopAppBar -->
+<header class="flex justify-between items-center w-full px-margin-mobile h-16 z-50 bg-white/80 backdrop-blur-md shadow-sm sticky top-0">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary text-2xl" data-weight="fill">rocket_launch</span>
+<h1 class="text-headline-sm text-primary font-bold tracking-tight">OrderXpress</h1>
+</div>
+<div class="w-10 h-10 rounded-full overflow-hidden border-2 border-primary/10">
+<img alt="Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCjw90bbXdF2tVPQ12-9BtXwVl5TcbPqhQl4OA_weTWfVIPMBTTVmMXvCSMx-uNiWvHRYl3SZgfSYaLgw2rLw-cEqDmf5xJv6YmUi76QcGpZ7JJqz88K53QmvJxpK2ZxDdQXs-A2dKkOERrFsoplbKJ1awmASDhImKmncgrD0_5EWlwwgJnsC71v3qSYdvgjbX-06S-8uRvovRNO2KYh4fCM0251iLVVlfryc4n0dmpXaF7mOpZODlA">
+</div>
+</header>
+<main class="px-margin-mobile pt-6 space-y-6 max-w-2xl mx-auto">
+<!-- Welcome Section -->
+<section class="space-y-1">
+<h2 class="text-headline-md text-on-surface">Good Morning, Chef 👋</h2>
+<p class="text-body-sm text-on-surface-variant">Le Gourmet Bistro • Admin Terminal</p>
+</section>
+<!-- Main Action: Scan Menu (Prominent Navy Hero Card) -->
+<section class="relative group cursor-pointer overflow-hidden rounded-2xl shadow-lg transition-transform active:scale-[0.98]">
+<div class="absolute inset-0 bg-primary z-0"></div>
+<div class="absolute inset-0 z-0 bg-cover bg-center mix-blend-overlay opacity-40" style="background-image: url('https://www.gstatic.com/labs-code/stitch/stitch-placeholder-300x300.svg')"></div>
+<div class="relative z-10 p-10 flex flex-col items-center text-center space-y-6">
+<div class="w-20 h-20 bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl flex items-center justify-center">
+<span class="material-symbols-outlined text-white text-5xl">qr_code_scanner</span>
+</div>
+<div class="space-y-2">
+<h3 class="text-headline-lg text-white font-bold">Scan Physical Menu</h3>
+<p class="text-body-md text-white/80">Digitize items instantly using AI vision</p>
+</div>
+</div>
+</section>
+<!-- Quick Stats Grid -->
+<section class="grid grid-cols-2 gap-4">
+<!-- Active Tables Card -->
+<div class="glass-card rounded-xl shadow-sm flex flex-col justify-between min-h-[120px] p-4">
+<div class="flex justify-between items-start">
+<span class="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider">Active Tables</span>
+<div class="p-2 bg-accent-blue-tint rounded-lg">
+<span class="material-symbols-outlined text-primary text-xl">table_restaurant</span>
+</div>
+</div>
+<div class="flex items-baseline gap-2">
+<span class="text-headline-lg text-on-surface">14</span>
+<span class="text-label-md text-success font-semibold">+2</span>
+</div>
+</div>
+<!-- Orders Today Card -->
+<div class="glass-card rounded-xl shadow-sm flex flex-col justify-between min-h-[120px] p-4">
+<div class="flex justify-between items-start">
+<span class="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider">Orders Today</span>
+<div class="p-2 bg-accent-blue-tint rounded-lg">
+<span class="material-symbols-outlined text-primary text-xl">receipt_long</span>
+</div>
+</div>
+<div class="flex items-baseline gap-2">
+<span class="text-headline-lg text-on-surface">128</span>
+<span class="text-label-md text-success font-semibold">+12%</span>
+</div>
+</div>
+</section>
+<!-- Revenue Insights Card -->
+<section class="glass-card rounded-2xl shadow-sm space-y-6 p-4">
+<div class="flex justify-between items-center">
+<h3 class="text-headline-sm text-on-surface">Revenue Insight</h3>
+<button class="text-primary font-bold text-label-md flex items-center gap-1 uppercase tracking-wider h-[56px] px-8 rounded-2xl">
+                    View All <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+<div class="bg-surface-container-low/50 rounded-2xl p-6 space-y-4">
+<div>
+<span class="text-headline-lg text-on-surface font-bold">₹2,45,080.00</span>
+<p class="text-body-sm text-on-surface-variant">Peak performance today at 1:30 PM</p>
+</div>
+<div class="flex items-end gap-3 h-32 pt-4">
+<div class="flex-1 chart-bar h-[30%]"></div>
+<div class="flex-1 chart-bar h-[45%]"></div>
+<div class="flex-1 chart-bar h-[25%]"></div>
+<div class="flex-1 chart-bar h-[65%]"></div>
+<div class="flex-1 chart-bar h-[55%]"></div>
+<div class="flex-1 chart-bar-active h-full"></div>
+<div class="flex-1 chart-bar h-[80%]"></div>
+</div>
+</div>
+</section>
+<!-- Quick Management -->
+<section class="space-y-3">
+<h3 class="text-[11px] font-bold text-on-surface-variant uppercase px-1 tracking-widest">Quick Management</h3>
+<div class="space-y-3">
+<div class="flex items-center justify-between p-4 bg-white border border-border rounded-xl shadow-sm hover:bg-surface-container-low transition-colors cursor-pointer group">
+<div class="flex items-center gap-4">
+<div class="p-3 bg-accent-blue-tint text-primary rounded-xl">
+<span class="material-symbols-outlined">qr_code_2</span>
+</div>
+<div>
+<p class="text-body-md text-on-surface font-bold">QR Generator</p>
+<p class="text-body-sm text-on-surface-variant">Create codes for Table 1-20</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline group-hover:translate-x-1 transition-transform">chevron_right</span>
+</div>
+<div class="flex items-center justify-between p-4 bg-white border border-border rounded-xl shadow-sm hover:bg-surface-container-low transition-colors cursor-pointer group">
+<div class="flex items-center gap-4">
+<div class="p-3 bg-accent-blue-tint text-primary rounded-xl">
+<span class="material-symbols-outlined">payments</span>
+</div>
+<div>
+<p class="text-body-md text-on-surface font-bold">Payments</p>
+<p class="text-body-sm text-on-surface-variant">3 transactions pending</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline group-hover:translate-x-1 transition-transform">chevron_right</span>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 w-full z-50 flex justify-around items-center px-4 py-3 pb-safe bg-white border-t border-border shadow-[0_-4px_12px_rgba(0,0,0,0.03)]">
+<!-- Dashboard (Active) -->
+<a class="flex flex-col items-center justify-center" href="#">
+<div class="bg-black rounded-[14px] px-5 py-2 flex flex-col items-center justify-center transition-all">
+<span class="material-symbols-outlined text-white text-[20px]" data-weight="fill">grid_view</span>
+<span class="text-[10px] font-bold text-white uppercase tracking-tighter">Dashboard</span>
+</div>
+</a>
+<!-- Menu -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant space-y-1" href="#">
+<span class="material-symbols-outlined text-[24px]">restaurant_menu</span>
+<span class="text-label-sm">Menu</span>
+</a>
+<!-- Orders -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant space-y-1" href="#">
+<span class="material-symbols-outlined text-[24px]">receipt_long</span>
+<span class="text-label-sm">Orders</span>
+</a>
+<!-- Payments -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant space-y-1" href="#">
+<span class="material-symbols-outlined text-[24px]">account_balance_wallet</span>
+<span class="text-label-sm">Payments</span>
+</a>
+<!-- Settings -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant space-y-1" href="#">
+<span class="material-symbols-outlined text-[24px]">settings</span>
+<span class="text-label-sm">Settings</span>
+</a>
+</nav>
+<script>
+        // Interactive</script>
+
+</body></html>

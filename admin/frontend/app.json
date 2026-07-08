@@ -1,0 +1,10 @@
+{
+  "expo": {
+    "name": "OrderXpress Admin",
+    "slug": "orderxpress-admin",
+    "scheme": "orderxpress-admin",
+    "platforms": ["ios", "android"],
+    "orientation": "portrait",
+    "userInterfaceStyle": "light"
+  }
+}
