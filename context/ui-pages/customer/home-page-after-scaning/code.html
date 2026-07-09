@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<title>OrderXpress | Spice Route Kitchen</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary-container": "#0b3877",
+                        "secondary": "#5d5e64",
+                        "on-tertiary-fixed-variant": "#74340b",
+                        "surface": "#FFFFFF",
+                        "inverse-primary": "#adc6ff",
+                        "surface-bright": "#faf9ff",
+                        "on-tertiary": "#ffffff",
+                        "border": "#EDEEF1",
+                        "success": "#358F6C",
+                        "warning": "#BA864C",
+                        "accent-blue-tint": "#EAF2FF",
+                        "on-tertiary-container": "#e68e5e",
+                        "background": "#F7F8FA",
+                        "on-primary": "#ffffff",
+                        "on-secondary-container": "#616269",
+                        "on-error": "#ffffff",
+                        "on-surface": "#1a1b20",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-tint": "#3a5d9e",
+                        "on-secondary-fixed-variant": "#45474c",
+                        "tertiary-fixed": "#ffdbcb",
+                        "on-secondary-fixed": "#1a1b21",
+                        "tertiary-fixed-dim": "#ffb690",
+                        "success-container": "#E7F7EF",
+                        "primary-fixed-dim": "#adc6ff",
+                        "inverse-on-surface": "#f1f0f6",
+                        "error-container": "#ffdad6",
+                        "outline-variant": "#c4c6d2",
+                        "primary-fixed": "#d8e2ff",
+                        "surface-container-highest": "#e2e2e8",
+                        "surface-container-high": "#e8e7ee",
+                        "tertiary": "#421800",
+                        "secondary-container": "#dfdfe6",
+                        "tertiary-container": "#642800",
+                        "text-secondary": "#7A7F8A",
+                        "on-primary-fixed": "#001a41",
+                        "surface-variant": "#e2e2e8",
+                        "inverse-surface": "#2f3035",
+                        "surface-container": "#eeedf3",
+                        "on-tertiary-fixed": "#341100",
+                        "text-primary": "#111318",
+                        "error": "#E5484D",
+                        "surface-container-low": "#f4f3f9",
+                        "secondary-fixed": "#e2e2e9",
+                        "on-background": "#1a1b20",
+                        "primary": "#000000",
+                        "on-primary-fixed-variant": "#1f4584",
+                        "on-surface-variant": "#434750",
+                        "on-secondary": "#ffffff",
+                        "warning-container": "#FDECD9",
+                        "on-primary-container": "#82a4e9",
+                        "on-error-container": "#93000a",
+                        "outline": "#747781",
+                        "surface-dim": "#dad9df"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-desktop": "24px",
+                        "gutter": "16px",
+                        "stack-sm": "8px",
+                        "card-padding": "16px",
+                        "margin-mobile": "16px",
+                        "stack-md": "16px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Inter"],
+                        "label-md": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-sm": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["24px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "headline-md": ["20px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                        "headline-sm": ["16px", {"lineHeight": "1.4", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                        "label-md": ["12px", {"lineHeight": "1", "fontWeight": "600"}],
+                        "body-md": ["13px", {"lineHeight": "1.5", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+        .animate-slide-up { animation: slideUp 0.3s cubic-bezier(0, 0, 0.2, 1); }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen pb-32">
+<!-- TopAppBar -->
+<header class="bg-surface/80 backdrop-blur-md shadow-sm fixed top-0 left-0 right-0 h-16 flex justify-between items-center px-margin-mobile z-50">
+<div class="flex items-center gap-2">
+<div class="bg-primary text-on-primary w-8 h-8 rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-[20px]" data-icon="electric_bolt">electric_bolt</span>
+</div>
+<h1 class="font-headline-lg text-primary">OrderXpress</h1>
+</div>
+<div class="w-10 h-10 rounded-full overflow-hidden border border-outline-variant">
+<img class="w-full h-full object-cover" data-alt="Profile" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCH42XOk3CEHh6jr_dOUF1bLFGz3lZK9NQbZt7aLeFe6FFtFNrRuTa8GNu0mZCpdzBu4mRsvhjeKEbskFnx4V_1nErJMNoqRL8s8uYE2_OqJnmFr61m_6a4x3GFaLEn96mSVEntdbzcelOvQ0izh9HfwhZmGqRYhKYT82BRrbW1zL9rTtlkFPhbb1ePmvYzn-SUXbgvmjZ3m3ZrK2tm1DMtt-ww0gCBBQCtBn51EgUwICkg7qwf4RZh"/>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="mt-20 px-margin-mobile">
+<!-- Hero Banner -->
+<section class="mb-8">
+<div class="flex justify-between items-start mb-2">
+<h2 class="font-headline-lg text-[28px]">Spice Route Kitchen</h2>
+<span class="bg-surface-container-highest text-on-surface px-3 py-1 rounded-full font-label-md text-label-md">Table #12</span>
+</div>
+<p class="text-on-surface-variant font-body-md">Authentic flavors served with a modern twist.</p>
+</section>
+<!-- Category Tabs -->
+<nav class="sticky top-16 bg-background/95 backdrop-blur-sm z-40 py-4 -mx-margin-mobile px-margin-mobile overflow-x-auto hide-scrollbar flex gap-2">
+<button class="whitespace-nowrap px-6 py-2 rounded-full bg-primary text-on-primary font-label-md text-label-md transition-all" onclick="setActiveTab(this)">All</button>
+<button class="whitespace-nowrap px-6 py-2 rounded-full bg-surface-container-high text-on-surface-variant font-label-md text-label-md transition-all" onclick="setActiveTab(this)">Starters</button>
+<button class="whitespace-nowrap px-6 py-2 rounded-full bg-surface-container-high text-on-surface-variant font-label-md text-label-md transition-all" onclick="setActiveTab(this)">Mains</button>
+<button class="whitespace-nowrap px-6 py-2 rounded-full bg-surface-container-high text-on-surface-variant font-label-md text-label-md transition-all" onclick="setActiveTab(this)">Drinks</button>
+<button class="whitespace-nowrap px-6 py-2 rounded-full bg-surface-container-high text-on-surface-variant font-label-md text-label-md transition-all" onclick="setActiveTab(this)">Desserts</button>
+</nav>
+<!-- Menu Sections -->
+<div class="space-y-10 mt-6">
+<!-- Starters -->
+<section id="starters">
+<div class="flex justify-between items-center mb-4">
+<h3 class="font-headline-md text-primary">Starters</h3>
+<span class="text-label-md font-label-md text-outline">4 ITEMS</span>
+</div>
+<div class="grid grid-cols-1 gap-4">
+<!-- Item 1 -->
+<div class="flex bg-surface rounded-xl overflow-hidden shadow-sm border border-border">
+<div class="w-32 h-32 flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="Paneer Tikka" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCH42XOk3CEHh6jr_dOUF1bLFGz3lZK9NQbZt7aLeFe6FFtFNrRuTa8GNu0mZCpdzBu4mRsvhjeKEbskFnx4V_1nErJMNoqRL8s8uYE2_OqJnmFr61m_6a4x3GFaLEn96mSVEntdbzcelOvQ0izh9HfwhZmGqRYhKYT82BRrbW1zL9rTtlkFPhbb1ePmvYzn-SUXbgvmjZ3m3ZrK2tm1DMtt-ww0gCBBQCtBn51EgUwICkg7qwf4RZh"/>
+</div>
+<div class="p-4 flex flex-col justify-between flex-grow">
+<div>
+<h4 class="font-headline-sm">Paneer Tikka</h4>
+<p class="text-body-sm text-on-surface-variant line-clamp-1">Grilled cottage cheese, bell peppers.</p>
+<span class="font-headline-sm text-on-surface mt-1 block">₹320</span>
+</div>
+<div class="flex justify-end">
+<button class="w-10 h-10 rounded-full bg-black text-white flex items-center justify-center active:scale-90 transition-transform" onclick="addToCart('Paneer Tikka', 320)">
+<span class="material-symbols-outlined">add</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Item 2 -->
+<div class="flex bg-surface rounded-xl overflow-hidden shadow-sm border border-border">
+<div class="w-32 h-32 flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="Samosa Chat" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBHgdl3K9jV63_oP-h85XRoen2NaMAU5Q_V9gDQbJbGoh-wWCGbFe_Q-p8aaZJb6mIiohF2L8BLmS99Iuf5Zn4s0930HFTlRbXLt8tjK3fY4Wl_uWVPoWQYOIl7bCzIpKokbPxjyPFkPTw4Fog7nnOm0dMW3cMSsMdC8yd9K1EWviwpoF90cjcofmTZszQXXrD_ym8TzWvhjlu8ZDYeEh-HWYFcwbx-8bqyLUCJ6e97cl1yIUvCo330"/>
+</div>
+<div class="p-4 flex flex-col justify-between flex-grow">
+<div>
+<h4 class="font-headline-sm">Samosa Chat</h4>
+<p class="text-body-sm text-on-surface-variant line-clamp-1">Tangy street-style crushed samosas.</p>
+<span class="font-headline-sm text-on-surface mt-1 block">₹180</span>
+</div>
+<div class="flex justify-end">
+<button class="w-10 h-10 rounded-full bg-black text-white flex items-center justify-center active:scale-90 transition-transform" onclick="addToCart('Samosa Chat', 180)">
+<span class="material-symbols-outlined">add</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Mains -->
+<section id="mains">
+<div class="flex justify-between items-center mb-4">
+<h3 class="font-headline-md text-primary">Mains</h3>
+<span class="text-label-md font-label-md text-outline">6 ITEMS</span>
+</div>
+<div class="grid grid-cols-1 gap-6">
+<!-- Feature Card -->
+<div class="bg-surface rounded-xl overflow-hidden shadow-sm border border-border flex flex-col">
+<div class="h-48 w-full relative">
+<img class="w-full h-full object-cover" data-alt="Butter Chicken" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC0pw4P7As4ua7RXggB91xzFC6Sb2rG0AHpQYe6WqvKaq9z8fuCxCPqE1m8xSS6UMEefTV2S6Us2YjgXiKVkFhltkPqEOnzse_siKzEHgef3t_AvCNjmUn4ajCyDI_WlPVFQnp0JNita8H-zhddbwX8-jGtNcAM8W-ZIlallSAKvovKnnPX6Ukci102MjMaX2yd9AXPD8PfeSUju2Mn3qt8vRZAIORvX-C1yLdbG_rHskrRirDg-ZC3"/>
+<div class="absolute top-4 right-4 bg-primary text-white px-3 py-1 rounded-full font-label-md text-label-md">House Special</div>
+</div>
+<div class="p-4">
+<div class="flex justify-between items-start mb-2">
+<h4 class="font-headline-md">Butter Chicken</h4>
+<span class="font-headline-md text-on-surface">₹540</span>
+</div>
+<p class="text-body-md text-on-surface-variant mb-4">Classic creamy tomato gravy, tender chicken pieces. Best with Naan.</p>
+<button class="w-full py-3 bg-black text-white rounded-lg font-label-md text-label-md flex items-center justify-center gap-2 active:scale-[0.98] transition-all" onclick="addToCart('Butter Chicken', 540)">
+<span class="material-symbols-outlined text-[20px]">add_shopping_cart</span>
+                                ADD TO ORDER
+                            </button>
+</div>
+</div>
+<!-- Grid for Smaller Mains -->
+<div class="grid grid-cols-2 gap-4">
+<div class="bg-surface rounded-xl overflow-hidden shadow-sm border border-border">
+<div class="h-32">
+<img class="w-full h-full object-cover" data-alt="Dal Makhani" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBf9o-blkCa_RXahWwr2l0XhYvbdGV4-PqoyAw3w-IwgDuPWqm6ucD1LdT1yse6uqKwU80OgH3TLCk8eeth2ywvXSB962C8F-7Cx4uOyc1w8eaEXyQvwxOBAejOyVxeDq6q5nNttmb88HxHEzd81cyBbXLM8bld1iFYprNtHIL3cTKycKzsRcL6lhYpdSo-fs64gwKmk-dUHZGzuEhgMaPvxBO-j25epYOWpLuXdFQOMCWOIiKxm7Vs"/>
+</div>
+<div class="p-3">
+<h4 class="font-label-md font-bold truncate">Dal Makhani</h4>
+<div class="flex justify-between items-center mt-2">
+<span class="text-on-surface font-semibold">₹380</span>
+<button class="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center" onclick="addToCart('Dal Makhani', 380)">
+<span class="material-symbols-outlined text-[18px]">add</span>
+</button>
+</div>
+</div>
+</div>
+<div class="bg-surface rounded-xl overflow-hidden shadow-sm border border-border">
+<div class="h-32">
+<img class="w-full h-full object-cover" data-alt="Mutton Biryani" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAWg5bD1VuoR3i2me-p-gNc7qRxzfNSv8mw3O3aYLuUtJV1gHwVKEWCuI1VZ1vv40nBERm7KJUXSgMrC1Bv5zbozjTF78_wv9vasjhcxkBJ93HPJD3JJvGUrvP9frFdPMr2OkfWF0PSirrYFhYihTmpox1BCZE59bN5U2DHOk4ExMo4l9AS2M444Gt4i4iYNl6EDYqUvc41R7ImsBagSKDl7kEzVuR_9YyRMcxc7S_jmS34MWRCEG7"/>
+</div>
+<div class="p-3">
+<h4 class="font-label-md font-bold truncate">Mutton Biryani</h4>
+<div class="flex justify-between items-center mt-2">
+<span class="text-on-surface font-semibold">₹620</span>
+<button class="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center" onclick="addToCart('Mutton Biryani', 620)">
+<span class="material-symbols-outlined text-[18px]">add</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+</main>
+<!-- View Order Sticky Bar (Visible when items in cart) -->
+<div class="fixed bottom-0 left-0 right-0 z-50 p-4 transition-transform duration-300 translate-y-32" id="cart-fab">
+<button class="w-full h-14 px-6 bg-black text-white rounded-xl shadow-2xl flex items-center justify-between active:scale-[0.98] transition-all" onclick="toggleCartSheet()">
+<div class="flex items-center gap-3">
+<div class="relative">
+<span class="material-symbols-outlined">shopping_basket</span>
+<span class="absolute -top-2 -right-2 bg-[#FF4D4D] text-white text-[10px] w-5 h-5 rounded-full flex items-center justify-center font-bold border-2 border-black" id="cart-count">0</span>
+</div>
+<span class="font-headline-sm uppercase tracking-wider">View Order</span>
+</div>
+<span class="font-headline-md" id="cart-total">₹0</span>
+</button>
+</div>
+<!-- Cart Slide-over Sheet -->
+<div class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] hidden opacity-0 transition-opacity duration-300" id="cart-overlay" onclick="toggleCartSheet()">
+<div class="absolute bottom-0 left-0 right-0 h-[80vh] bg-surface rounded-t-[32px] p-6 shadow-2xl animate-slide-up flex flex-col" onclick="event.stopPropagation()">
+<!-- Handle -->
+<div class="w-12 h-1 bg-outline-variant/50 rounded-full mx-auto mb-6"></div>
+<div class="flex justify-between items-center mb-8">
+<h2 class="font-headline-lg">Your Order</h2>
+<button class="text-on-surface-variant p-2" onclick="toggleCartSheet()">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<div class="flex-grow overflow-y-auto space-y-4 pr-2 hide-scrollbar" id="cart-items">
+<!-- Empty state -->
+<div class="text-center py-20 text-on-surface-variant">
+<span class="material-symbols-outlined text-[64px] mb-4 opacity-20">shopping_bag</span>
+<p class="font-body-md">Your cart is currently empty</p>
+</div>
+</div>
+<div class="mt-auto pt-6 border-t border-border">
+<div class="flex justify-between items-center mb-6">
+<span class="font-body-md text-on-surface-variant">Total Amount</span>
+<span class="font-headline-lg text-primary" id="sheet-total">₹0</span>
+</div>
+<button class="w-full py-4 bg-black text-white rounded-xl font-headline-sm active:scale-[0.98] transition-transform">
+                    Place Order
+                </button>
+</div>
+</div>
+</div>
+<script>
+        let cart = [];
+        let total = 0;
+
+        function addToCart(name, price) {
+            cart.push({ name, price });
+            updateCartUI();
+            
+            const fab = document.getElementById('cart-fab');
+            fab.classList.remove('translate-y-32');
+            fab.classList.add('translate-y-0');
+        }
+
+        function updateCartUI() {
+            const count = cart.length;
+            total = cart.reduce((sum, item) => sum + item.price, 0);
+            
+            document.getElementById('cart-count').innerText = count;
+            document.getElementById('cart-total').innerText = `₹${total}`;
+            document.getElementById('sheet-total').innerText = `₹${total}`;
+            
+            const itemsContainer = document.getElementById('cart-items');
+            if (count === 0) {
+                itemsContainer.innerHTML = `
+                    <div class="text-center py-20 text-on-surface-variant">
+                        <span class="material-symbols-outlined text-[64px] mb-4 opacity-20">shopping_bag</span>
+                        <p class="font-body-md">Your cart is currently empty</p>
+                    </div>`;
+                document.getElementById('cart-fab').classList.add('translate-y-32');
+            } else {
+                itemsContainer.innerHTML = cart.map((item, index) => `
+                    <div class="flex justify-between items-center p-4 bg-surface-container-low rounded-xl animate-slide-up">
+                        <div>
+                            <h4 class="font-headline-sm">${item.name}</h4>
+                            <span class="text-on-surface font-semibold">₹${item.price}</span>
+                        </div>
+                        <button onclick="removeFromCart(${index})" class="text-error w-8 h-8 flex items-center justify-center bg-error-container rounded-full">
+                            <span class="material-symbols-outlined text-[20px]">delete</span>
+                        </button>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            updateCartUI();
+        }
+
+        function toggleCartSheet() {
+            const overlay = document.getElementById('cart-overlay');
+            if (overlay.classList.contains('hidden')) {
+                overlay.classList.remove('hidden');
+                setTimeout(() => overlay.classList.add('opacity-100'), 10);
+            } else {
+                overlay.classList.remove('opacity-100');
+                setTimeout(() => overlay.classList.add('hidden'), 300);
+            }
+        }
+
+        function setActiveTab(btn) {
+            const buttons = btn.parentElement.querySelectorAll('button');
+            buttons.forEach(b => {
+                b.classList.remove('bg-primary', 'text-on-primary');
+                b.classList.add('bg-surface-container-high', 'text-on-surface-variant');
+            });
+            btn.classList.add('bg-primary', 'text-on-primary');
+            btn.classList.remove('bg-surface-container-high', 'text-on-surface-variant');
+        }
+    </script>
+</body></html>

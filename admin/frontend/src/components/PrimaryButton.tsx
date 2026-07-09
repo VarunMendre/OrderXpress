@@ -17,7 +17,11 @@ export function PrimaryButton({
       accessibilityRole="button"
       disabled={disabled}
       onPress={onPress}
-      style={({ pressed }) => [
+      style={({
+        pressed,
+      }: {
+        pressed: boolean;
+      }) => [
         styles.button,
         disabled && styles.buttonDisabled,
         pressed && !disabled && styles.buttonPressed,

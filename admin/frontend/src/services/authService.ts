@@ -16,6 +16,7 @@ export type AuthResponse = {
     restaurantName?: string;
     adminId: string;
     restaurantId: string;
+    sessionToken: string;
   };
 };
 

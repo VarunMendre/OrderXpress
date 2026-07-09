@@ -3,7 +3,7 @@
     "name": "OrderXpress Admin",
     "slug": "orderxpress-admin",
     "scheme": "orderxpress-admin",
-    "platforms": ["ios", "android"],
+    "platforms": ["ios", "android", "web"],
     "orientation": "portrait",
     "userInterfaceStyle": "light"
   }

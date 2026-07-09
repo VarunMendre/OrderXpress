@@ -7,8 +7,8 @@ Update this file after every completed feature so the current state is always ob
 ## Current Status
 
 **Phase:** 1 - Foundation  
-**Last completed:** Admin auth frontend/backend wiring and backend typecheck pass  
-**Next:** Finish admin authentication runtime verification, then build restaurant setup
+**Last completed:** Settings screen with restaurant profile and bank details
+**Next:** Build customer QR landing and menu view
 
 ---
 
@@ -17,18 +17,18 @@ Update this file after every completed feature so the current state is always ob
 ### Phase 1 - Foundation
 
 - [x] 01 Repository and App Shell
-- [ ] 02 Admin Authentication
-- [ ] 03 Admin Home and Restaurant Setup
-- [ ] 04 Menu Extraction Pipeline
+- [x] 02 Admin Authentication
+- [x] 03 Admin Home and Restaurant Setup
+- [x] 04 Menu Extraction Pipeline
 
 ### Phase 2 - Admin Operations
 
-- [ ] 05 Menu CRUD
-- [ ] 06 QR Code Generation
-- [ ] 07 Orders List
-- [ ] 08 Single Order Details
-- [ ] 09 Collections
-- [ ] 10 Settings
+- [x] 05 Menu CRUD
+- [x] 06 QR Code Generation
+- [x] 07 Orders List
+- [x] 08 Single Order Details
+- [x] 09 Collections
+- [x] 10 Settings
 
 ### Phase 3 - Customer Ordering
 
@@ -61,3 +61,13 @@ Update this file after every completed feature so the current state is always ob
 - Admin mobile app starts in Expo mobile mode
 - Admin auth frontend posts to the admin backend `/auth` endpoint
 - Admin backend returns structured register/login responses
+- Admin auth hands off into the home/setup screen after successful submit
+- Admin menu extraction uses image picker + backend draft extraction
+- Admin auth now creates an in-memory session token
+- Menu extraction uses real multipart file upload
+- Menu CRUD supports add/edit/delete/toggle/publish in-memory
+- QR generation now creates signed, expiring table sessions with backend QR previews
+- Orders list now exposes a live in-memory feed with filters and quick status changes
+- Single order detail now opens from the order list and supports lifecycle updates
+- Collections dashboard now filters by date and shows revenue summary data
+- Settings screen now edits restaurant identity, tables, and bank details

@@ -7,7 +7,11 @@ import { colors, radius, spacing } from "../theme/tokens";
 
 type AuthMode = "login" | "register";
 
-export function AuthScreen() {
+type AuthScreenProps = {
+  onAuthenticated: (restaurantName: string, restaurantId: string, sessionToken: string) => void;
+};
+
+export function AuthScreen({ onAuthenticated }: AuthScreenProps) {
   const [mode, setMode] = useState<AuthMode>("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -45,6 +49,11 @@ export function AuthScreen() {
         mode === "login"
           ? `Signed in as ${response.data?.email}.`
           : `Created ${targetName} successfully.`,
+      );
+      onAuthenticated(
+        response.data?.restaurantName ?? targetName,
+        response.data?.restaurantId ?? "",
+        response.data?.sessionToken ?? "",
       );
       Alert.alert("OrderXpress", response.message);
     } catch {

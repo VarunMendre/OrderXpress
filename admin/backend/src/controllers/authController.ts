@@ -10,6 +10,7 @@ export function processAuthPayload(payload: unknown): {
     restaurantName?: string;
     adminId: string;
     restaurantId: string;
+    sessionToken: string;
   };
 } {
   const result = validateAuthRequest(payload);
