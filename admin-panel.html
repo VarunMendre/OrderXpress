@@ -37,6 +37,39 @@
   --shadow-lg: 0 4px 12px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
 }
+.dark-mode {
+  --bg-primary: #0F1117;
+  --bg-secondary: #0F1117;
+  --bg-card: #1A1D2B;
+  --bg-card-hover: #222639;
+  --bg-nav: #0F1117;
+  --bg-input: #1A1D2B;
+  --accent: #E5E7EB;
+  --accent-light: #9CA3AF;
+  --accent-glow: rgba(229,231,235,0.08);
+  --teal: #60A5FA;
+  --teal-glow: rgba(96,165,250,0.15);
+  --amber: #FBBF24;
+  --amber-glow: rgba(251,191,36,0.15);
+  --red: #F87171;
+  --red-glow: rgba(248,113,113,0.15);
+  --green: #4ADE80;
+  --pink: #60A5FA;
+  --text-primary: #F1F5F9;
+  --text-secondary: #94A3B8;
+  --text-muted: #64748B;
+  --border: rgba(255,255,255,0.08);
+  --border-light: rgba(255,255,255,0.12);
+  --shadow: 0 1px 3px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2);
+  --shadow-lg: 0 4px 12px rgba(0,0,0,0.4), 0 2px 4px rgba(0,0,0,0.25);
+}
+.dark-mode .btn-primary,
+.dark-mode .btn-add-item,
+.dark-mode .fab,
+.dark-mode .login-btn { background: #fff !important; color: #111827 !important; }
+.dark-mode .login-logo { background: #fff; color: #111827; }
+.dark-mode .filter-tab.active { background: #374151; color: #fff; }
+.dark-mode .login-btn-outline { border-color: rgba(255,255,255,0.2); }
 html, body { height: 100%; overflow: hidden; }
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -424,6 +457,12 @@ body {
   cursor: pointer; font-family: inherit; transition: all 0.2s;
 }
 .btn-secondary:active { background: var(--bg-card-hover); }
+.btn-add-item {
+  padding: 8px 14px; border-radius: 12px; border: none;
+  background: #111827; color: #fff;
+  font-size: 12px; font-weight: 600; cursor: pointer;
+  font-family: inherit; display: flex; align-items: center; gap: 4px;
+}
 
 /* FAB */
 .fab {
@@ -632,7 +671,7 @@ body {
         <h2>Products</h2>
         <div style="display:flex;gap:8px;align-items:center">
           <span class="page-count" id="productsCount">48 items</span>
-          <button onclick="openAddItemModal()" style="padding:8px 14px;border-radius:12px;border:none;background:#111827;color:#fff;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:4px">
+          <button onclick="openAddItemModal()" class="btn-add-item">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
             Add Item
           </button>
@@ -676,6 +715,11 @@ body {
 
       <div class="settings-group">
         <div class="group-title">Preferences</div>
+        <div class="settings-item">
+          <div class="si-icon teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></div>
+          <div class="si-content"><h4>Dark Mode</h4><p id="darkModeLabel">Off</p></div>
+          <button class="toggle" id="darkModeToggle" onclick="toggleDarkMode()"></button>
+        </div>
         <div class="settings-item">
           <div class="si-icon purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div>
           <div class="si-content"><h4>Push Notifications</h4><p>New orders, updates</p></div>
@@ -1105,7 +1149,28 @@ function resetAddItemForm() {
   if (!toggle.classList.contains('on')) toggle.classList.add('on');
 }
 
+// ===== DARK MODE =====
+function toggleDarkMode() {
+  const html = document.documentElement;
+  const toggle = document.getElementById('darkModeToggle');
+  const label = document.getElementById('darkModeLabel');
+  const isDark = html.classList.toggle('dark-mode');
+  toggle.classList.toggle('on', isDark);
+  label.textContent = isDark ? 'On' : 'Off';
+  localStorage.setItem('ox-admin-theme', isDark ? 'dark' : 'light');
+}
+
+function checkSavedTheme() {
+  const saved = localStorage.getItem('ox-admin-theme');
+  if (saved === 'dark') {
+    document.documentElement.classList.add('dark-mode');
+    document.getElementById('darkModeToggle').classList.add('on');
+    document.getElementById('darkModeLabel').textContent = 'On';
+  }
+}
+
 // ===== INIT =====
+checkSavedTheme();
 renderChart();
 renderRecent();
 renderAllOrders();
