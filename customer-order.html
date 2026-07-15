@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>OrderXpress - Order</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --bg: #F7F8FA;
+  --bg-card: #FFFFFF;
+  --bg-card-hover: #F3F4F6;
+  --text-primary: #111827;
+  --text-secondary: #6B7280;
+  --text-muted: #9CA3AF;
+  --accent: #111827;
+  --blue: #2563EB;
+  --red: #EF4444;
+  --green: #16A34A;
+  --amber: #F59E0B;
+  --border: #E5E7EB;
+  --radius: 16px;
+  --radius-sm: 10px;
+  --radius-xs: 6px;
+  --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-lg: 0 4px 12px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-top: env(safe-area-inset-top, 0px);
+}
+html, body { height: 100%; overflow: hidden; }
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
+.app-container {
+  display: flex; flex-direction: column; height: 100%;
+  max-width: 480px; margin: 0 auto; position: relative; overflow: hidden;
+}
+
+/* Header */
+.header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 20px; padding-top: max(12px, var(--safe-top));
+  background: var(--bg-card); border-bottom: 1px solid var(--border);
+  min-height: 60px; flex-shrink: 0;
+}
+.header-left { display: flex; align-items: center; gap: 10px; }
+.header-logo {
+  width: 32px; height: 32px; border-radius: 8px;
+  background: var(--accent); display: flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: 14px; color: #fff;
+}
+.header-left h1 { font-size: 16px; font-weight: 700; }
+.header-left span { color: var(--text-muted); font-weight: 500; }
+.header-right { display: flex; align-items: center; gap: 8px; }
+.cart-btn {
+  position: relative; width: 38px; height: 38px; border-radius: 10px;
+  border: none; background: var(--bg); color: var(--text-secondary);
+  display: flex; align-items: center; justify-content: center; cursor: pointer;
+}
+.cart-btn svg { width: 20px; height: 20px; }
+.cart-badge {
+  position: absolute; top: -2px; right: -2px;
+  min-width: 18px; height: 18px; border-radius: 9px;
+  background: var(--red); color: #fff; font-size: 10px; font-weight: 700;
+  display: none; align-items: center; justify-content: center; padding: 0 4px;
+}
+.cart-badge.show { display: flex; }
+
+/* Main content */
+.main-content {
+  flex: 1; overflow-y: auto; overflow-x: hidden;
+  -webkit-overflow-scrolling: touch; scroll-behavior: smooth;
+}
+.page { display: none; animation: fadeIn 0.3s ease; padding: 16px; padding-bottom: 100px; }
+.page.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ----- Welcome Page ----- */
+.welcome { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: calc(100vh - 60px); text-align: center; padding: 24px; }
+.welcome-logo { width: 72px; height: 72px; border-radius: 20px; background: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: 800; color: #fff; margin-bottom: 20px; }
+.welcome h2 { font-size: 24px; font-weight: 700; margin-bottom: 6px; }
+.welcome p { font-size: 14px; color: var(--text-secondary); margin-bottom: 32px; }
+.welcome-options { display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 280px; }
+.welcome-btn {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  padding: 16px; border-radius: var(--radius); border: 1.5px solid var(--border);
+  background: var(--bg-card); cursor: pointer; font-family: inherit;
+  font-size: 15px; font-weight: 600; color: var(--text-primary);
+  transition: all 0.15s; box-shadow: var(--shadow);
+}
+.welcome-btn:active { transform: scale(0.97); background: var(--bg-card-hover); }
+.welcome-btn svg { width: 22px; height: 22px; color: var(--accent); }
+.welcome-btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+.welcome-btn.primary svg { color: #fff; }
+
+/* ----- Category Grid ----- */
+.section-title { font-size: 18px; font-weight: 700; margin-bottom: 14px; }
+.category-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+.category-card {
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  padding: 20px 12px; border-radius: var(--radius);
+  border: 1px solid var(--border); background: var(--bg-card);
+  cursor: pointer; transition: all 0.15s; box-shadow: var(--shadow);
+}
+.category-card:active { transform: scale(0.96); }
+.category-card .cat-icon {
+  width: 48px; height: 48px; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+}
+.category-card .cat-icon svg { width: 24px; height: 24px; }
+.category-card h4 { font-size: 13px; font-weight: 600; }
+.category-card p { font-size: 11px; color: var(--text-muted); }
+
+/* ----- Menu Items ----- */
+.menu-header { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+.menu-header .back-btn {
+  width: 34px; height: 34px; border-radius: 10px; border: 1px solid var(--border);
+  background: var(--bg-card); cursor: pointer; display: flex;
+  align-items: center; justify-content: center; flex-shrink: 0;
+}
+.menu-header .back-btn svg { width: 18px; height: 18px; color: var(--text-secondary); }
+.menu-header h2 { font-size: 18px; font-weight: 700; flex: 1; }
+.menu-items { display: flex; flex-direction: column; gap: 10px; }
+.menu-item {
+  display: flex; gap: 12px; padding: 12px; border-radius: var(--radius-sm);
+  border: 1px solid var(--border); background: var(--bg-card);
+  box-shadow: var(--shadow); cursor: pointer; transition: all 0.15s;
+}
+.menu-item:active { transform: scale(0.98); }
+.menu-item .item-img {
+  width: 68px; height: 68px; border-radius: 10px; flex-shrink: 0;
+  overflow: hidden; background: var(--bg);
+}
+.menu-item .item-img img { width: 100%; height: 100%; object-fit: cover; }
+.menu-item .item-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.menu-item .item-info h4 { font-size: 14px; font-weight: 600; }
+.menu-item .item-info .item-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.3; }
+.menu-item .item-info .item-price { font-size: 15px; font-weight: 700; color: var(--blue); margin-top: auto; }
+.menu-item .item-add {
+  width: 32px; height: 32px; border-radius: 50%; border: none;
+  background: var(--accent); color: #fff; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; align-self: center; transition: all 0.15s;
+}
+.menu-item .item-add:active { transform: scale(0.85); }
+.menu-item .item-add svg { width: 16px; height: 16px; }
+.item-qty {
+  display: none; align-items: center; gap: 6px; align-self: center; flex-shrink: 0;
+}
+.item-qty.show { display: flex; }
+.item-qty button {
+  width: 28px; height: 28px; border-radius: 50%; border: 1px solid var(--border);
+  background: var(--bg-card); cursor: pointer; display: flex;
+  align-items: center; justify-content: center; font-size: 14px; font-weight: 600;
+  color: var(--text-primary);
+}
+.item-qty button:active { background: var(--bg-card-hover); }
+.item-qty span { font-size: 14px; font-weight: 600; min-width: 20px; text-align: center; }
+
+/* ----- Cart Page ----- */
+.cart-empty {
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; padding: 60px 20px; text-align: center;
+}
+.cart-empty svg { width: 48px; height: 48px; color: var(--text-muted); margin-bottom: 12px; }
+.cart-empty h3 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+.cart-empty p { font-size: 13px; color: var(--text-secondary); }
+.cart-items { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+.cart-item {
+  display: flex; gap: 12px; padding: 12px; border-radius: var(--radius-sm);
+  border: 1px solid var(--border); background: var(--bg-card);
+  box-shadow: var(--shadow);
+}
+.cart-item .ci-img {
+  width: 52px; height: 52px; border-radius: 8px; overflow: hidden; flex-shrink: 0;
+  background: var(--bg);
+}
+.cart-item .ci-img img { width: 100%; height: 100%; object-fit: cover; }
+.cart-item .ci-info { flex: 1; min-width: 0; }
+.cart-item .ci-info h4 { font-size: 13px; font-weight: 600; }
+.cart-item .ci-info .ci-price { font-size: 13px; font-weight: 700; color: var(--blue); }
+.cart-item .ci-right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+.cart-item .ci-right .ci-total { font-size: 14px; font-weight: 700; }
+.cart-item .ci-remove {
+  width: 28px; height: 28px; border-radius: 50%; border: none;
+  background: rgba(239,68,68,0.1); color: var(--red); cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+}
+.cart-item .ci-remove svg { width: 14px; height: 14px; }
+
+/* ----- Cart Summary ----- */
+.cart-summary {
+  background: var(--bg-card); border-radius: var(--radius);
+  border: 1px solid var(--border); padding: 16px; box-shadow: var(--shadow);
+  margin-bottom: 16px;
+}
+.cs-row {
+  display: flex; justify-content: space-between; padding: 6px 0;
+  font-size: 13px; color: var(--text-secondary);
+}
+.cs-row.total { font-size: 16px; font-weight: 700; color: var(--text-primary); border-top: 1px solid var(--border); padding-top: 10px; margin-top: 4px; }
+.order-type-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600;
+  background: rgba(37,99,235,0.1); color: var(--blue); margin-bottom: 12px;
+}
+
+/* ----- Buttons ----- */
+.btn-primary, .btn-checkout {
+  width: 100%; padding: 16px; border-radius: var(--radius-sm);
+  border: none; background: var(--accent); color: #fff;
+  font-size: 15px; font-weight: 600; cursor: pointer; font-family: inherit;
+  transition: all 0.15s;
+}
+.btn-primary:active, .btn-checkout:active { opacity: 0.85; transform: scale(0.98); }
+.btn-outline {
+  width: 100%; padding: 14px; border-radius: var(--radius-sm);
+  border: 1px solid var(--border); background: var(--bg-card);
+  color: var(--text-primary); font-size: 14px; font-weight: 600;
+  cursor: pointer; font-family: inherit;
+}
+.btn-outline:active { background: var(--bg-card-hover); }
+
+/* ----- Bottom CTA ----- */
+.bottom-cta {
+  position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+  width: 100%; max-width: 480px; padding: 12px 16px;
+  padding-bottom: max(12px, var(--safe-bottom));
+  background: var(--bg-card); border-top: 1px solid var(--border);
+  display: none; z-index: 20;
+}
+.bottom-cta.show { display: block; }
+
+/* ----- Success Page ----- */
+.success-page {
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; min-height: calc(100vh - 60px);
+  text-align: center; padding: 24px;
+}
+.success-icon {
+  width: 72px; height: 72px; border-radius: 50%;
+  background: rgba(22,163,74,0.1); display: flex;
+  align-items: center; justify-content: center; margin-bottom: 20px;
+}
+.success-icon svg { width: 36px; height: 36px; color: var(--green); }
+.success-page h2 { font-size: 22px; font-weight: 700; margin-bottom: 6px; }
+.success-page p { font-size: 14px; color: var(--text-secondary); margin-bottom: 4px; }
+.success-page .order-id { font-size: 13px; font-weight: 600; color: var(--blue); margin-bottom: 24px; }
+.success-actions { display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 280px; }
+
+/* ----- Checkout Fields ----- */
+.checkout-fields { display: flex; flex-direction: column; gap: 14px; margin-bottom: 20px; }
+.field-group { display: flex; flex-direction: column; gap: 6px; }
+.field-group label { font-size: 12px; font-weight: 600; color: var(--text-secondary); }
+.field-group input, .field-group textarea {
+  padding: 12px 14px; border-radius: var(--radius-sm);
+  border: 1px solid var(--border); background: var(--bg-card);
+  color: var(--text-primary); font-size: 14px; font-family: inherit;
+  outline: none;
+}
+.field-group input:focus, .field-group textarea:focus { border-color: var(--accent); }
+.field-group textarea { resize: none; }
+
+/* ----- Toast ----- */
+#toast {
+  position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
+  background: var(--accent); color: #fff; padding: 10px 20px;
+  border-radius: 10px; font-size: 13px; font-weight: 500;
+  z-index: 100; display: none; max-width: 90%; text-align: center;
+  animation: toastIn 0.25s ease;
+}
+@keyframes toastIn { from { opacity: 0; transform: translateX(-50%) translateY(10px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+</style>
+</head>
+<body>
+<div class="app-container" id="app">
+
+  <!-- Header -->
+  <header class="header" id="appHeader">
+    <div class="header-left">
+      <div class="header-logo">OX</div>
+      <h1>Order<span>Xpress</span></h1>
+    </div>
+    <div class="header-right">
+      <button class="cart-btn" onclick="showPage('cart')" aria-label="Cart">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+        <span class="cart-badge" id="cartBadge">0</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main-content" id="mainContent">
+
+    <!-- Welcome Page -->
+    <div class="page active" id="page-welcome">
+      <div class="welcome">
+        <div class="welcome-logo">OX</div>
+        <h2>Welcome to OrderXpress</h2>
+        <p>Fresh food, fast service — how would you like to order?</p>
+        <div class="welcome-options">
+          <button class="welcome-btn primary" onclick="startOrder('dine-in')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18V3H3z"/><path d="M3 9h18"/><path d="M9 3v18"/></svg>
+            Dine In
+          </button>
+          <button class="welcome-btn" onclick="startOrder('takeaway')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.29 7 12 12 20.71 7"/><line x1="12" y1="22" x2="12" y2="12"/></svg>
+            Take Away
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Categories Page -->
+    <div class="page" id="page-categories">
+      <div class="section-title">What would you like?</div>
+      <div class="category-grid" id="categoryGrid"></div>
+    </div>
+
+    <!-- Menu Items Page -->
+    <div class="page" id="page-items">
+      <div class="menu-header">
+        <button class="back-btn" onclick="showPage('categories')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <h2 id="itemsPageTitle">Starters</h2>
+      </div>
+      <div class="menu-items" id="menuItems"></div>
+    </div>
+
+    <!-- Cart Page -->
+    <div class="page" id="page-cart">
+      <div class="section-title">Your Order</div>
+      <div id="orderTypeBadge"></div>
+      <div id="cartContent">
+        <div class="cart-empty">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+          <h3>Your cart is empty</h3>
+          <p>Browse the menu to add items</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Checkout Page -->
+    <div class="page" id="page-checkout">
+      <div class="section-title">Checkout</div>
+      <div id="checkoutSummary"></div>
+      <div class="checkout-fields">
+        <div class="field-group">
+          <label>Your Name</label>
+          <input type="text" id="custName" placeholder="Enter your name">
+        </div>
+        <div class="field-group">
+          <label id="custDetailLabel">Table Number</label>
+          <input type="text" id="custDetail" placeholder="e.g. 5">
+        </div>
+        <div class="field-group">
+          <label>Special Notes</label>
+          <textarea id="custNotes" rows="2" placeholder="Any allergies or preferences?"></textarea>
+        </div>
+      </div>
+      <button class="btn-primary" onclick="placeOrder()">Place Order</button>
+    </div>
+
+    <!-- Success Page -->
+    <div class="page" id="page-success">
+      <div class="success-page">
+        <div class="success-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <h2>Order Placed!</h2>
+        <p>Your order has been sent to the kitchen.</p>
+        <div class="order-id" id="successOrderId">#ORD-0000</div>
+        <div class="success-actions">
+          <button class="btn-primary" onclick="resetOrder()">Order Again</button>
+          <button class="btn-outline" onclick="showPage('categories')">Back to Menu</button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Bottom CTA -->
+  <div class="bottom-cta" id="bottomCta">
+    <button class="btn-checkout" onclick="showPage('checkout')">
+      <span id="ctaText">View Cart · $0.00</span>
+    </button>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast"></div>
+</div>
+
+<script>
+// ===== DATA =====
+const menuData = [
+  { id: 1, name: 'Margherita Pizza', category: 'Mains', price: 14.99, desc: 'Classic tomato, mozzarella & basil', img: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=120&h=120&fit=crop&auto=format' },
+  { id: 2, name: 'Paneer Tikka', category: 'Starters', price: 12.99, desc: 'Spiced cottage cheese with mint chutney', img: 'https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?w=120&h=120&fit=crop&auto=format' },
+  { id: 3, name: 'Butter Chicken', category: 'Mains', price: 18.99, desc: 'Creamy tomato curry with tender chicken', img: 'https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?w=120&h=120&fit=crop&auto=format' },
+  { id: 4, name: 'Chocolate Lava Cake', category: 'Desserts', price: 9.99, desc: 'Warm molten chocolate with vanilla ice cream', img: 'https://images.unsplash.com/photo-1606313564200-e75d5e30476c?w=120&h=120&fit=crop&auto=format' },
+  { id: 5, name: 'Gulab Jamun', category: 'Desserts', price: 6.99, desc: 'Milk dumplings in rose-scented syrup', img: 'https://images.unsplash.com/photo-1595475207225-428b62bda831?w=120&h=120&fit=crop&auto=format' },
+  { id: 6, name: 'Caesar Salad', category: 'Starters', price: 11.99, desc: 'Crisp romaine, parmesan & croutons', img: 'https://images.unsplash.com/photo-1546793665-c74683f339c1?w=120&h=120&fit=crop&auto=format' },
+  { id: 7, name: 'Mango Lassi', category: 'Drinks', price: 5.99, desc: 'Creamy yogurt drink with alphonso mango', img: 'https://images.unsplash.com/photo-1621263764928-df1444c5e859?w=120&h=120&fit=crop&auto=format' },
+  { id: 8, name: 'Red Wine', category: 'Drinks', price: 8.50, desc: 'Glass of house red — full-bodied', img: 'https://images.unsplash.com/photo-1510818376871-4a9d54bba4c2?w=120&h=120&fit=crop&auto=format' },
+  { id: 9, name: 'Garlic Naan', category: 'Mains', price: 4.99, desc: 'Tandoor-baked bread with garlic butter', img: 'https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=120&h=120&fit=crop&auto=format' },
+  { id: 10, name: 'Spring Rolls', category: 'Starters', price: 8.99, desc: 'Crispy veg rolls with sweet chili dip', img: 'https://images.unsplash.com/photo-1606525437817-0055ae15fba9?w=120&h=120&fit=crop&auto=format' },
+  { id: 11, name: 'Browine Sundae', category: 'Desserts', price: 8.49, desc: 'Warm brownie with ice cream & fudge', img: 'https://images.unsplash.com/photo-1563805042-7684c019e1cb?w=120&h=120&fit=crop&auto=format' },
+  { id: 12, name: 'Fresh Lime Soda', category: 'Drinks', price: 3.99, desc: 'Sparkling lime with a hint of mint', img: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=120&h=120&fit=crop&auto=format' },
+];
+
+const categories = [
+  { key: 'Starters', icon: 'utensils', color: '#F59E0B', bg: 'rgba(245,158,11,0.12)', count: 0 },
+  { key: 'Mains', icon: 'beef', color: '#EF4444', bg: 'rgba(239,68,68,0.1)', count: 0 },
+  { key: 'Drinks', icon: 'cup', color: '#2563EB', bg: 'rgba(37,99,235,0.1)', count: 0 },
+  { key: 'Desserts', icon: 'cake', color: '#16A34A', bg: 'rgba(22,163,74,0.1)', count: 0 },
+];
+
+const catIcons = {
+  utensils: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></svg>',
+  beef: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 5c0-1.7-1.3-3-3-3s-3 1.3-3 3c0 3 2.5 5 5 5 1.7 0 3-1.3 3-3 0-2-3-3-3-5z"/><path d="M12 8c-2 0-4 1.5-5 4-1 2.5-1.5 5-2.5 6-.5.5-1 1-1.5 1h-1"/><path d="M16 11c2 0 4 2 4 5 0 2-2 3-4 3s-4-1-4-3c0-3 2-5 4-5z"/></svg>',
+  cup: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>',
+  cake: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="14" width="18" height="7" rx="2"/><path d="M3 14c0-3 2-5 4-7 1-1 3-2 5-2s4 1 5 2c2 2 4 4 4 7"/><line x1="12" y1="5" x2="12" y2="14"/><line x1="7" y1="5" x2="5" y2="3"/><line x1="17" y1="5" x2="19" y2="3"/></svg>',
+};
+
+// ===== STATE =====
+let cart = [];
+let orderType = 'dine-in';
+let currentCategory = 'Starters';
+let orderCounter = 3843;
+
+// Count items per category
+categories.forEach(c => { c.count = menuData.filter(i => i.category === c.key).length; });
+
+// ===== RENDER =====
+function renderCategories() {
+  const grid = document.getElementById('categoryGrid');
+  grid.innerHTML = categories.map(c => `
+    <div class="category-card" onclick="selectCategory('${c.key}')">
+      <div class="cat-icon" style="background:${c.bg};color:${c.color}">${catIcons[c.icon]}</div>
+      <h4>${c.key}</h4>
+      <p>${c.count} items</p>
+    </div>
+  `).join('');
+}
+
+function renderItems(category) {
+  const items = menuData.filter(i => i.category === category);
+  const container = document.getElementById('menuItems');
+  document.getElementById('itemsPageTitle').textContent = category;
+
+  container.innerHTML = items.map(item => {
+    const inCart = cart.find(c => c.id === item.id);
+    const qty = inCart ? inCart.qty : 0;
+    return `
+      <div class="menu-item">
+        <div class="item-img"><img src="${item.img}" alt="${item.name}" loading="lazy"></div>
+        <div class="item-info">
+          <h4>${item.name}</h4>
+          <div class="item-desc">${item.desc}</div>
+          <div class="item-price">$${item.price.toFixed(2)}</div>
+        </div>
+        <div class="item-qty ${qty > 0 ? 'show' : ''}" id="iq-${item.id}">
+          <button onclick="updateQty(${item.id}, -1)">−</button>
+          <span id="iqv-${item.id}">${qty}</span>
+          <button onclick="updateQty(${item.id}, 1)">+</button>
+        </div>
+        <button class="item-add ${qty > 0 ? 'show' : ''}" id="ia-${item.id}" onclick="addToCart(${item.id})" style="${qty > 0 ? 'display:none' : ''}">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </button>
+      </div>
+    `;
+  }).join('');
+}
+
+function renderCart() {
+  const container = document.getElementById('cartContent');
+  const badge = document.getElementById('cartBadge');
+  const totalItems = cart.reduce((s, i) => s + i.qty, 0);
+  badge.textContent = totalItems;
+  badge.classList.toggle('show', totalItems > 0);
+
+  document.getElementById('orderTypeBadge').innerHTML = `<div class="order-type-badge">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">${orderType === 'dine-in' ? '<path d="M3 3v18h18V3H3z"/><path d="M3 9h18"/><path d="M9 3v18"/>' : '<polyline points="3.29 7 12 12 20.71 7"/><line x1="12" y1="22" x2="12" y2="12"/>'}</svg>
+    ${orderType === 'dine-in' ? 'Dine In' : 'Take Away'}
+  </div>`;
+
+  if (cart.length === 0) {
+    container.innerHTML = `
+      <div class="cart-empty">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+        <h3>Your cart is empty</h3>
+        <p>Browse the menu to add items</p>
+      </div>`;
+    updateCta();
+    return;
+  }
+
+  const subtotal = cart.reduce((s, i) => s + i.price * i.qty, 0);
+  const tax = subtotal * 0.08;
+  const total = subtotal + tax;
+
+  container.innerHTML = `
+    <div class="cart-items">
+      ${cart.map(item => `
+        <div class="cart-item">
+          <div class="ci-img"><img src="${item.img}" alt="${item.name}" loading="lazy"></div>
+          <div class="ci-info">
+            <h4>${item.name}</h4>
+            <div class="ci-price">$${item.price.toFixed(2)}</div>
+          </div>
+          <div class="ci-right">
+            <div class="ci-total">$${(item.price * item.qty).toFixed(2)}</div>
+            <div style="display:flex;align-items:center;gap:6px">
+              <button style="width:26px;height:26px;border-radius:50%;border:1px solid var(--border);background:var(--bg-card);cursor:pointer;font-size:12px;font-weight:600" onclick="updateQty(${item.id}, -1)">−</button>
+              <span style="font-size:13px;font-weight:600;min-width:16px;text-align:center">${item.qty}</span>
+              <button style="width:26px;height:26px;border-radius:50%;border:1px solid var(--border);background:var(--bg-card);cursor:pointer;font-size:12px;font-weight:600" onclick="updateQty(${item.id}, 1)">+</button>
+            </div>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+    <div class="cart-summary">
+      <div class="cs-row"><span>Subtotal</span><span>$${subtotal.toFixed(2)}</span></div>
+      <div class="cs-row"><span>Tax (8%)</span><span>$${tax.toFixed(2)}</span></div>
+      <div class="cs-row total"><span>Total</span><span>$${total.toFixed(2)}</span></div>
+    </div>
+    <button class="btn-primary" onclick="showPage('checkout')">Proceed to Checkout</button>
+  `;
+  updateCta();
+}
+
+function renderCheckout() {
+  const subtotal = cart.reduce((s, i) => s + i.price * i.qty, 0);
+  const tax = subtotal * 0.08;
+  const total = subtotal + tax;
+  const detailLabel = orderType === 'dine-in' ? 'Table Number' : 'Pickup Time';
+
+  document.getElementById('checkoutSummary').innerHTML = `
+    <div class="order-type-badge">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">${orderType === 'dine-in' ? '<path d="M3 3v18h18V3H3z"/><path d="M3 9h18"/><path d="M9 3v18"/>' : '<polyline points="3.29 7 12 12 20.71 7"/><line x1="12" y1="22" x2="12" y2="12"/>'}</svg>
+      ${orderType === 'dine-in' ? 'Dine In' : 'Take Away'}
+    </div>
+    <div class="cart-summary">
+      ${cart.map(item => `<div class="cs-row"><span>${item.name} × ${item.qty}</span><span>$${(item.price * item.qty).toFixed(2)}</span></div>`).join('')}
+      <div class="cs-row" style="margin-top:6px;padding-top:8px;border-top:1px solid var(--border)"><span>Subtotal</span><span>$${subtotal.toFixed(2)}</span></div>
+      <div class="cs-row"><span>Tax (8%)</span><span>$${tax.toFixed(2)}</span></div>
+      <div class="cs-row total"><span>Total</span><span>$${total.toFixed(2)}</span></div>
+    </div>
+  `;
+  document.getElementById('custDetailLabel').textContent = detailLabel;
+}
+
+// ===== ACTIONS =====
+function startOrder(type) {
+  orderType = type;
+  showPage('categories');
+}
+
+function selectCategory(category) {
+  currentCategory = category;
+  renderItems(category);
+  showPage('items');
+}
+
+function addToCart(id) {
+  const item = menuData.find(i => i.id === id);
+  const existing = cart.find(c => c.id === id);
+  if (existing) { existing.qty++; }
+  else { cart.push({ ...item, qty: 1 }); }
+  renderItems(currentCategory);
+  renderCart();
+  showToast(`${item.name} added`);
+}
+
+function updateQty(id, delta) {
+  const existing = cart.find(c => c.id === id);
+  if (!existing) {
+    if (delta > 0) addToCart(id);
+    return;
+  }
+  existing.qty += delta;
+  if (existing.qty <= 0) { cart = cart.filter(c => c.id !== id); }
+  renderItems(currentCategory);
+  renderCart();
+  if (document.getElementById('page-checkout').classList.contains('active')) renderCheckout();
+}
+
+function updateCta() {
+  const total = cart.reduce((s, i) => s + i.price * i.qty, 0);
+  const count = cart.reduce((s, i) => s + i.qty, 0);
+  const cta = document.getElementById('bottomCta');
+  const text = document.getElementById('ctaText');
+  if (count > 0 && !document.getElementById('page-checkout').classList.contains('active') && !document.getElementById('page-cart').classList.contains('active')) {
+    cta.classList.add('show');
+    text.textContent = `View Cart · $${total.toFixed(2)}`;
+  } else {
+    cta.classList.remove('show');
+  }
+}
+
+function placeOrder() {
+  const name = document.getElementById('custName').value.trim();
+  const detail = document.getElementById('custDetail').value.trim();
+  if (!name) { showToast('Please enter your name'); return; }
+  if (!detail) { showToast(`Please enter your ${orderType === 'dine-in' ? 'table number' : 'pickup time'}`); return; }
+
+  orderCounter++;
+  const orderId = `#ORD-${orderCounter}`;
+  document.getElementById('successOrderId').textContent = orderId;
+  showPage('success');
+  cart = [];
+  renderCart();
+  showToast('Order placed successfully!');
+}
+
+function resetOrder() {
+  cart = [];
+  orderType = 'dine-in';
+  currentCategory = 'Starters';
+  document.getElementById('custName').value = '';
+  document.getElementById('custDetail').value = '';
+  document.getElementById('custNotes').value = '';
+  renderCart();
+  showPage('welcome');
+}
+
+// ===== NAVIGATION =====
+function showPage(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  document.getElementById('mainContent').scrollTop = 0;
+  if (page === 'cart') renderCart();
+  if (page === 'checkout') renderCheckout();
+  updateCta();
+}
+
+// ===== TOAST =====
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.display = 'block';
+  clearTimeout(t._timeout);
+  t._timeout = setTimeout(() => t.style.display = 'none', 2000);
+}
+
+// ===== INIT =====
+renderCategories();
+</script>
+</body>
+</html>
