@@ -1,0 +1,1186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>OrderXpress Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --bg-primary: #F7F8FA;
+  --bg-secondary: #F7F8FA;
+  --bg-card: #FFFFFF;
+  --bg-card-hover: #F3F4F6;
+  --bg-nav: #FFFFFF;
+  --bg-input: #F3F4F6;
+  --accent: #111827;
+  --accent-light: #374151;
+  --accent-glow: rgba(17,24,39,0.06);
+  --teal: #2563EB;
+  --teal-glow: rgba(37,99,235,0.1);
+  --amber: #F59E0B;
+  --amber-glow: rgba(245,158,11,0.12);
+  --red: #EF4444;
+  --red-glow: rgba(239,68,68,0.1);
+  --green: #16A34A;
+  --pink: #2563EB;
+  --text-primary: #111827;
+  --text-secondary: #6B7280;
+  --text-muted: #9CA3AF;
+  --border: #E5E7EB;
+  --border-light: #E5E7EB;
+  --radius: 16px;
+  --radius-sm: 10px;
+  --radius-xs: 6px;
+  --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-lg: 0 4px 12px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+.dark-mode {
+  --bg-primary: #0F1117;
+  --bg-secondary: #0F1117;
+  --bg-card: #1A1D2B;
+  --bg-card-hover: #222639;
+  --bg-nav: #0F1117;
+  --bg-input: #1A1D2B;
+  --accent: #E5E7EB;
+  --accent-light: #9CA3AF;
+  --accent-glow: rgba(229,231,235,0.08);
+  --teal: #60A5FA;
+  --teal-glow: rgba(96,165,250,0.15);
+  --amber: #FBBF24;
+  --amber-glow: rgba(251,191,36,0.15);
+  --red: #F87171;
+  --red-glow: rgba(248,113,113,0.15);
+  --green: #4ADE80;
+  --pink: #60A5FA;
+  --text-primary: #F1F5F9;
+  --text-secondary: #94A3B8;
+  --text-muted: #64748B;
+  --border: rgba(255,255,255,0.08);
+  --border-light: rgba(255,255,255,0.12);
+  --shadow: 0 1px 3px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2);
+  --shadow-lg: 0 4px 12px rgba(0,0,0,0.4), 0 2px 4px rgba(0,0,0,0.25);
+}
+.dark-mode .btn-primary,
+.dark-mode .btn-add-item,
+.dark-mode .fab,
+.dark-mode .login-btn { background: #fff !important; color: #111827 !important; }
+.dark-mode .login-logo { background: #fff; color: #111827; }
+.dark-mode .filter-tab.active { background: #374151; color: #fff; }
+.dark-mode .login-btn-outline { border-color: rgba(255,255,255,0.2); }
+html, body { height: 100%; overflow: hidden; }
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+.app-container { display: flex; flex-direction: column; height: 100%; max-width: 480px; margin: 0 auto; position: relative; overflow: hidden; }
+
+/* Header */
+.header {
+  position: sticky; top: 0; z-index: 50;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 20px; padding-top: max(12px, env(safe-area-inset-top, 12px));
+  background: var(--bg-primary);
+  border-bottom: 1px solid var(--border);
+  min-height: 60px;
+}
+.header-left { display: flex; align-items: center; gap: 12px; }
+.header-left .logo {
+  width: 36px; height: 36px; border-radius: 10px;
+  background: #111827;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: 16px; color: #fff;
+}
+.header-left h1 { font-size: 18px; font-weight: 700; letter-spacing: -0.3px; }
+.header-left h1 span { color: var(--text-muted); }
+.header-right { display: flex; align-items: center; gap: 8px; }
+.header-btn {
+  width: 38px; height: 38px; border-radius: 10px; border: none;
+  background: var(--bg-card); color: var(--text-secondary);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: all 0.2s; position: relative;
+  box-shadow: var(--shadow);
+}
+.header-btn:hover, .header-btn:active { background: var(--bg-card-hover); color: var(--text-primary); }
+.header-btn svg { width: 20px; height: 20px; }
+.notif-dot {
+  position: absolute; top: 6px; right: 6px;
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--red); border: 2px solid var(--bg-primary);
+}
+.avatar {
+  width: 34px; height: 34px; border-radius: 50%;
+  background: #111827;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 600; color: #fff; cursor: pointer;
+}
+
+/* Main Content */
+.main-content {
+  flex: 1; overflow-y: auto; overflow-x: hidden;
+  padding: 16px 16px 0;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+.main-content::-webkit-scrollbar { width: 4px; }
+.main-content::-webkit-scrollbar-track { background: transparent; }
+.main-content::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+.page { display: none; animation: fadeIn 0.3s ease; }
+.page.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+/* Bottom Navigation */
+.bottom-nav {
+  display: flex; align-items: center; justify-content: space-around;
+  padding: 8px 12px; padding-bottom: max(8px, var(--safe-bottom));
+  background: var(--bg-nav);
+  border-top: 1px solid var(--border);
+  position: sticky; bottom: 0; z-index: 50;
+}
+.nav-item {
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  padding: 6px 12px; border: none; background: none; cursor: pointer;
+  color: var(--text-muted); transition: all 0.2s; position: relative;
+  border-radius: 12px; min-width: 56px;
+}
+.nav-item svg { width: 22px; height: 22px; transition: all 0.2s; }
+.nav-item span { font-size: 10px; font-weight: 500; transition: all 0.2s; }
+.nav-item.active { color: var(--accent); }
+.nav-item:active { transform: scale(0.92); }
+
+/* Section Header */
+.section-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 12px; margin-top: 4px;
+}
+.section-header h2 { font-size: 16px; font-weight: 600; }
+.section-header .see-all {
+  font-size: 12px; color: var(--teal); font-weight: 500;
+  border: none; background: none; cursor: pointer;
+  padding: 4px 8px; border-radius: 6px; transition: all 0.2s;
+}
+.section-header .see-all:hover { background: var(--teal-glow); }
+
+/* Revenue Chart */
+.chart-card {
+  background: var(--bg-card); border-radius: var(--radius);
+  padding: 16px; border: 1px solid var(--border); margin-bottom: 20px;
+  box-shadow: var(--shadow);
+}
+.chart-card .chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+.chart-card .chart-header h3 { font-size: 14px; font-weight: 600; }
+.chart-card .chart-header .chart-period {
+  font-size: 11px; color: var(--text-muted); font-weight: 500;
+  background: var(--bg-input); padding: 4px 10px; border-radius: 6px;
+}
+.chart-bars { display: flex; align-items: flex-end; gap: 6px; height: 120px; }
+.chart-bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.chart-bar {
+  width: 100%; border-radius: 4px 4px 0 0;
+  background: linear-gradient(to top, var(--accent), #4B5563);
+  min-height: 4px; transition: height 0.6s ease;
+  position: relative;
+}
+.chart-bar-wrap:nth-child(3n+2) .chart-bar { background: linear-gradient(to top, var(--teal), #60A5FA); }
+.chart-bar-wrap:nth-child(3n+3) .chart-bar { background: linear-gradient(to top, var(--amber), #FBBF24); }
+.chart-bar-label { font-size: 9px; color: var(--text-muted); font-weight: 500; }
+
+/* Recent Orders */
+.order-list { margin-bottom: 20px; }
+.order-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 14px; background: var(--bg-card);
+  border-radius: var(--radius-sm); border: 1px solid var(--border);
+  margin-bottom: 8px; transition: all 0.2s; cursor: pointer;
+  box-shadow: var(--shadow);
+}
+.order-item:active { transform: scale(0.98); background: var(--bg-card-hover); }
+.order-item .order-avatar {
+  width: 40px; height: 40px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; overflow: hidden;
+}
+.order-item .order-info { flex: 1; min-width: 0; }
+.order-item .order-info h4 { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+.order-item .order-info p { font-size: 11px; color: var(--text-muted); }
+.order-item .order-info .order-products {
+  font-size: 11px; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.order-item .order-right { text-align: right; flex-shrink: 0; }
+.order-item .order-right .order-amount { font-size: 14px; font-weight: 700; }
+.order-item .order-right .order-time { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+
+/* Badge */
+.badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 8px; border-radius: 20px; font-size: 10px; font-weight: 600;
+}
+.badge-success { background: rgba(22, 163, 74, 0.1); color: var(--green); }
+.badge-warning { background: rgba(245, 158, 11, 0.12); color: var(--amber); }
+.badge-danger { background: rgba(239, 68, 68, 0.1); color: var(--red); }
+.badge-info { background: rgba(37, 99, 235, 0.1); color: var(--teal); }
+
+/* ===== ORDERS PAGE ===== */
+.page-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 16px;
+}
+.page-header h2 { font-size: 20px; font-weight: 700; }
+.page-header .page-count { font-size: 12px; color: var(--text-muted); font-weight: 500; }
+
+.search-bar {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 10px 14px;
+  margin-bottom: 14px; transition: border-color 0.2s;
+  box-shadow: var(--shadow);
+}
+.search-bar:focus-within { border-color: var(--accent); }
+.search-bar svg { width: 18px; height: 18px; color: var(--text-muted); flex-shrink: 0; }
+.search-bar input {
+  flex: 1; border: none; background: none; outline: none;
+  color: var(--text-primary); font-size: 14px; font-family: inherit;
+}
+.search-bar input::placeholder { color: var(--text-muted); }
+
+.filter-tabs {
+  display: flex; gap: 6px; margin-bottom: 14px; overflow-x: auto;
+  -webkit-overflow-scrolling: touch; padding-bottom: 4px;
+}
+.filter-tabs::-webkit-scrollbar { display: none; }
+.filter-tab {
+  padding: 6px 14px; border-radius: 20px; border: 1px solid var(--border);
+  background: transparent; color: var(--text-muted); font-size: 12px;
+  font-weight: 500; cursor: pointer; white-space: nowrap;
+  transition: all 0.2s; font-family: inherit;
+}
+.filter-tab.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+.filter-tab:active { transform: scale(0.95); }
+
+/* ===== PRODUCTS PAGE ===== */
+.products-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px;
+}
+.product-card {
+  background: var(--bg-card); border-radius: var(--radius);
+  border: 1px solid var(--border); overflow: hidden;
+  transition: all 0.2s; cursor: pointer;
+  box-shadow: var(--shadow);
+}
+.product-card:active { transform: scale(0.97); }
+.product-card .product-img {
+  height: 100px; display: flex; align-items: center; justify-content: center;
+  position: relative; overflow: hidden; background: var(--bg-input);
+}
+.product-card .product-img .stock-badge {
+  position: absolute; top: 8px; right: 8px;
+}
+.product-card .product-body { padding: 10px 12px 12px; }
+.product-card .product-body h4 { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+.product-card .product-body .product-category { font-size: 10px; color: var(--text-muted); margin-bottom: 4px; }
+.product-card .product-body .product-price { font-size: 15px; font-weight: 700; color: var(--teal); }
+
+/* ===== CUSTOMERS PAGE ===== */
+.customer-list { margin-bottom: 20px; }
+.customer-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 14px; background: var(--bg-card);
+  border-radius: var(--radius-sm); border: 1px solid var(--border);
+  margin-bottom: 8px; transition: all 0.2s; cursor: pointer;
+  box-shadow: var(--shadow);
+}
+.customer-item:active { transform: scale(0.98); background: var(--bg-card-hover); }
+.customer-item .customer-avatar {
+  width: 42px; height: 42px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px; font-weight: 700; color: #fff; flex-shrink: 0;
+}
+.customer-item .customer-info { flex: 1; min-width: 0; }
+.customer-item .customer-info h4 { font-size: 13px; font-weight: 600; }
+.customer-item .customer-info p { font-size: 11px; color: var(--text-secondary); }
+.customer-item .customer-right { text-align: right; flex-shrink: 0; }
+.customer-item .customer-right .customer-orders { font-size: 14px; font-weight: 700; }
+.customer-item .customer-right .customer-spent { font-size: 10px; color: var(--text-muted); }
+
+/* ===== SETTINGS PAGE ===== */
+.settings-profile {
+  display: flex; align-items: center; gap: 14px;
+  background: var(--bg-card); border-radius: var(--radius);
+  padding: 16px; border: 1px solid var(--border);
+  margin-bottom: 20px; cursor: pointer;
+  box-shadow: var(--shadow);
+}
+.settings-profile:active { transform: scale(0.98); transition: 0.1s; }
+.settings-profile .profile-avatar {
+  width: 52px; height: 52px; border-radius: 50%;
+  background: #111827;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; font-weight: 700; color: #fff; flex-shrink: 0;
+}
+.settings-profile .profile-info h3 { font-size: 15px; font-weight: 600; }
+.settings-profile .profile-info p { font-size: 12px; color: var(--text-secondary); }
+.settings-profile .profile-arrow { margin-left: auto; color: var(--text-muted); }
+.settings-profile .profile-arrow svg { width: 18px; height: 18px; }
+
+.settings-group { margin-bottom: 20px; }
+.settings-group .group-title {
+  font-size: 11px; font-weight: 600; color: var(--text-muted);
+  text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; padding-left: 4px;
+}
+.settings-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 13px 14px; background: var(--bg-card);
+  border-radius: var(--radius-sm); border: 1px solid var(--border);
+  margin-bottom: 6px; cursor: pointer; transition: all 0.2s;
+  box-shadow: var(--shadow);
+}
+.settings-item:active { background: var(--bg-card-hover); }
+.settings-item .si-icon {
+  width: 34px; height: 34px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.settings-item .si-icon svg { width: 18px; height: 18px; }
+.settings-item .si-icon.purple { background: var(--accent-glow); color: var(--accent-light); }
+.settings-item .si-icon.teal { background: var(--teal-glow); color: var(--teal); }
+.settings-item .si-icon.amber { background: var(--amber-glow); color: var(--amber); }
+.settings-item .si-icon.red { background: var(--red-glow); color: var(--red); }
+.settings-item .si-content { flex: 1; }
+.settings-item .si-content h4 { font-size: 13px; font-weight: 600; }
+.settings-item .si-content p { font-size: 11px; color: var(--text-secondary); }
+.settings-item .si-right { color: var(--text-muted); }
+.settings-item .si-right svg { width: 16px; height: 16px; }
+
+/* Toggle Switch */
+.toggle {
+  width: 44px; height: 24px; border-radius: 12px; border: none;
+  background: var(--text-muted); position: relative; cursor: pointer;
+  transition: background 0.2s; flex-shrink: 0;
+}
+.toggle.on { background: var(--accent); }
+.toggle::after {
+  content: ''; position: absolute; top: 2px; left: 2px;
+  width: 20px; height: 20px; border-radius: 50%; background: #fff;
+  transition: transform 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+.toggle.on::after { transform: translateX(20px); }
+
+/* Status dot */
+.status-dot {
+  width: 8px; height: 8px; border-radius: 50%; display: inline-block;
+  margin-right: 4px;
+}
+.status-dot.online { background: var(--green); }
+.status-dot.offline { background: var(--text-muted); }
+.status-dot.away { background: var(--amber); }
+
+/* Modal */
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 100;
+  background: rgba(0,0,0,0.4); backdrop-filter: blur(8px);
+  display: none; align-items: flex-end; justify-content: center;
+  animation: fadeInOverlay 0.2s ease;
+}
+.modal-overlay.open { display: flex; }
+@keyframes fadeInOverlay { from { opacity: 0; } to { opacity: 1; } }
+.modal-content {
+  background: #FFFFFF; border-radius: var(--radius) var(--radius) 0 0;
+  width: 100%; max-width: 480px; max-height: 85vh; overflow-y: auto;
+  padding: 20px; animation: slideUp 0.3s ease;
+  border-top: 1px solid var(--border-light);
+}
+@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+.modal-content::-webkit-scrollbar { width: 4px; }
+.modal-content::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+.modal-handle {
+  width: 36px; height: 4px; border-radius: 2px;
+  background: var(--text-muted); margin: 0 auto 16px; opacity: 0.4;
+}
+.modal-content h3 { font-size: 18px; font-weight: 700; margin-bottom: 16px; }
+.modal-content .modal-detail-row {
+  display: flex; justify-content: space-between; padding: 10px 0;
+  border-bottom: 1px solid var(--border); font-size: 13px;
+}
+.modal-content .modal-detail-row .label { color: var(--text-muted); }
+.modal-content .modal-detail-row .value { font-weight: 600; }
+.modal-close {
+  width: 100%; padding: 14px; border-radius: var(--radius-sm);
+  border: 1px solid var(--border); background: var(--bg-card);
+  color: var(--text-primary); font-size: 14px; font-weight: 600;
+  cursor: pointer; margin-top: 16px; font-family: inherit;
+  transition: all 0.2s;
+}
+.modal-close:active { background: var(--bg-card-hover); }
+
+/* Form inputs */
+.form-input {
+  padding: 12px 14px; border-radius: var(--radius-sm);
+  border: 1px solid var(--border); background: var(--bg-input);
+  color: var(--text-primary); font-size: 14px; font-family: inherit;
+  outline: none; width: 100%;
+}
+.form-input:focus { border-color: var(--accent); }
+.form-select {
+  padding: 12px 14px; border-radius: var(--radius-sm);
+  border: 1px solid var(--border); background: var(--bg-input);
+  color: var(--text-primary); font-size: 14px; font-family: inherit;
+  outline: none; width: 100%;
+}
+.form-select:focus { border-color: var(--accent); }
+.form-textarea {
+  padding: 12px 14px; border-radius: var(--radius-sm);
+  border: 1px solid var(--border); background: var(--bg-input);
+  color: var(--text-primary); font-size: 14px; font-family: inherit;
+  outline: none; width: 100%; resize: none;
+}
+.form-textarea:focus { border-color: var(--accent); }
+.form-label {
+  font-size: 12px; font-weight: 600; color: var(--text-secondary);
+}
+.btn-primary {
+  padding: 14px; border-radius: var(--radius-sm); border: none;
+  background: #111827; color: #fff; font-size: 14px; font-weight: 600;
+  cursor: pointer; font-family: inherit; transition: all 0.2s;
+}
+.btn-primary:active { opacity: 0.85; }
+.btn-secondary {
+  padding: 14px; border-radius: var(--radius-sm);
+  border: 1px solid var(--border); background: var(--bg-card);
+  color: var(--text-primary); font-size: 14px; font-weight: 600;
+  cursor: pointer; font-family: inherit; transition: all 0.2s;
+}
+.btn-secondary:active { background: var(--bg-card-hover); }
+.btn-add-item {
+  padding: 8px 14px; border-radius: 12px; border: none;
+  background: #111827; color: #fff;
+  font-size: 12px; font-weight: 600; cursor: pointer;
+  font-family: inherit; display: flex; align-items: center; gap: 4px;
+}
+
+/* FAB */
+.fab {
+  position: fixed; bottom: 80px; right: calc(50% - 200px);
+  width: 52px; height: 52px; border-radius: 50%; border: none;
+  background: #111827; color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; box-shadow: var(--shadow-lg);
+  transition: all 0.2s; z-index: 40;
+}
+.fab:active { transform: scale(0.9); }
+.fab svg { width: 24px; height: 24px; }
+
+@media (max-width: 480px) {
+  .fab { right: 20px; }
+}
+
+/* Login Page */
+.login-page {
+  position: absolute; inset: 0; z-index: 300;
+  background: var(--bg-primary);
+  display: flex; align-items: center; justify-content: center;
+  padding: 24px;
+}
+.login-card {
+  width: 100%; max-width: 340px;
+  display: flex; flex-direction: column; align-items: center;
+}
+.login-logo {
+  width: 56px; height: 56px; border-radius: 16px;
+  background: #111827; display: flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: 22px; color: #fff;
+  margin-bottom: 20px;
+}
+.login-title { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+.login-subtitle { font-size: 14px; color: var(--text-muted); margin-bottom: 24px; }
+.login-input {
+  width: 100%; padding: 14px 16px; border-radius: 12px;
+  border: 1px solid var(--border); background: var(--bg-card);
+  color: var(--text-primary); font-size: 14px; font-family: inherit;
+  outline: none;
+}
+.login-input:focus { border-color: #111827; }
+.login-btn {
+  width: 100%; padding: 14px; border-radius: 12px;
+  border: none; background: #111827; color: #fff;
+  font-size: 15px; font-weight: 600; cursor: pointer; font-family: inherit;
+}
+.login-btn:active { opacity: 0.85; }
+.login-divider {
+  display: flex; align-items: center; gap: 12px; width: 100%;
+  color: var(--text-muted); font-size: 12px; margin: 4px 0;
+}
+.login-divider::before, .login-divider::after {
+  content: ''; flex: 1; height: 1px; background: var(--border);
+}
+.login-btn-outline {
+  width: 100%; padding: 14px; border-radius: 12px;
+  border: 1px solid var(--border); background: transparent;
+  color: var(--text-primary); font-size: 15px; font-weight: 600;
+  cursor: pointer; font-family: inherit;
+}
+.login-btn-outline:active { background: var(--bg-card-hover); }
+
+/* Dashboard Summary */
+.dash-summary {
+  background: #2563EB; border-radius: 16px; padding: 18px;
+  margin-bottom: 16px;
+}
+.dash-summary-greeting {
+  font-size: 14px; font-weight: 600; color: #fff;
+  margin-bottom: 14px; opacity: 0.9;
+}
+.dash-summary-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+}
+.dash-stat-tile {
+  background: rgba(255,255,255,0.14); border: 0.5px solid rgba(255,255,255,0.3);
+  border-radius: 12px; padding: 12px 14px; display: flex;
+  flex-direction: column; gap: 6px;
+}
+.dash-stat-tile svg { width: 20px; height: 20px; color: #fff; }
+.dash-stat-label { font-size: 11px; color: rgba(255,255,255,0.8); font-weight: 500; }
+.dash-stat-value { font-size: 20px; font-weight: 800; color: #fff; letter-spacing: -0.3px; }
+
+/* Utility */
+.mt-4 { margin-top: 4px; }
+.mb-8 { margin-bottom: 8px; }
+.mb-12 { margin-bottom: 12px; }
+.mb-16 { margin-bottom: 16px; }
+.text-center { text-align: center; }
+.text-accent { color: var(--accent); }
+.text-teal { color: var(--teal); }
+.text-amber { color: var(--amber); }
+.text-red { color: var(--red); }
+.text-muted { color: var(--text-muted); }
+.fw-600 { font-weight: 600; }
+.fs-12 { font-size: 12px; }
+</style>
+</head>
+<body>
+<div class="app-container" id="app">
+  <!-- Login Page -->
+  <div class="login-page" id="loginPage">
+    <div class="login-card">
+      <div class="login-logo">OX</div>
+      <h1 class="login-title">QR Menu Admin</h1>
+      <p class="login-subtitle">Sign in to manage your restaurant</p>
+      <div style="display:flex;flex-direction:column;gap:12px;width:100%">
+        <input type="email" class="login-input" placeholder="Email address" id="loginEmail">
+        <input type="password" class="login-input" placeholder="Password" id="loginPassword">
+        <div style="text-align:right;margin-top:-4px">
+          <a style="font-size:12px;color:var(--text-muted);text-decoration:none;cursor:default">Forgot password?</a>
+        </div>
+        <button class="login-btn" onclick="login()">Login</button>
+        <div class="login-divider"><span>or</span></div>
+        <button class="login-btn-outline" onclick="showToast('Create account coming soon')">Create new account</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header-left">
+      <div class="logo">OX</div>
+      <h1>Order<span>Xpress</span></h1>
+    </div>
+    <div class="header-right">
+      <button class="header-btn" onclick="showNotif()" aria-label="Notifications">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <span class="notif-dot"></span>
+      </button>
+      <div class="avatar">A</div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main-content" id="mainContent">
+
+    <!-- Dashboard Page -->
+    <div class="page active" id="page-dashboard">
+      <div class="dash-summary">
+        <div class="dash-summary-greeting">Good morning, Chef <span style="font-weight:400;font-size:13px;opacity:0.7">· The Spice Route</span></div>
+        <div class="dash-summary-grid">
+          <div class="dash-stat-tile">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+            <div class="dash-stat-label">Today's Orders</div>
+            <div class="dash-stat-value" id="dashOrders">384</div>
+          </div>
+          <div class="dash-stat-tile">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+            <div class="dash-stat-label">Pending</div>
+            <div class="dash-stat-value" id="dashPending">23</div>
+          </div>
+          <div class="dash-stat-tile">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            <div class="dash-stat-label">Revenue</div>
+            <div class="dash-stat-value" id="dashRevenue">$12,480</div>
+          </div>
+          <div class="dash-stat-tile">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="12 6 15 12 21 12 16.5 16 18 22 12 18 6 22 7.5 16 3 12 9 12"/></svg>
+            <div class="dash-stat-label">Rating</div>
+            <div class="dash-stat-value" id="dashRating">4.8</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="chart-card">
+        <div class="chart-header">
+          <h3>Revenue Overview</h3>
+          <span class="chart-period">Last 7 days</span>
+        </div>
+        <div class="chart-bars" id="revenueChart"></div>
+      </div>
+
+      <div class="section-header">
+        <h2>Recent Orders</h2>
+        <button class="see-all" onclick="switchPage('orders')">See All</button>
+      </div>
+      <div class="order-list" id="recentOrders"></div>
+    </div>
+
+    <!-- Orders Page -->
+    <div class="page" id="page-orders">
+      <div class="page-header">
+        <h2>Orders</h2>
+        <span class="page-count" id="ordersCount">384 total</span>
+      </div>
+      <div class="search-bar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" placeholder="Search orders..." id="ordersSearch" oninput="filterOrders()">
+      </div>
+      <div class="filter-tabs" id="orderFilters">
+        <button class="filter-tab active" data-filter="all" onclick="setOrderFilter(this,'all')">All</button>
+        <button class="filter-tab" data-filter="completed" onclick="setOrderFilter(this,'completed')">Completed</button>
+        <button class="filter-tab" data-filter="processing" onclick="setOrderFilter(this,'processing')">Processing</button>
+        <button class="filter-tab" data-filter="pending" onclick="setOrderFilter(this,'pending')">Pending</button>
+        <button class="filter-tab" data-filter="cancelled" onclick="setOrderFilter(this,'cancelled')">Cancelled</button>
+      </div>
+      <div class="order-list" id="allOrders"></div>
+    </div>
+
+    <!-- Products Page -->
+    <div class="page" id="page-products">
+      <div class="page-header">
+        <h2>Products</h2>
+        <div style="display:flex;gap:8px;align-items:center">
+          <span class="page-count" id="productsCount">48 items</span>
+          <button onclick="openAddItemModal()" class="btn-add-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Add Item
+          </button>
+        </div>
+      </div>
+      <div class="search-bar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" placeholder="Search products..." id="productsSearch" oninput="filterProducts()">
+      </div>
+      <div class="products-grid" id="productsGrid"></div>
+    </div>
+
+    <!-- Customers Page -->
+    <div class="page" id="page-customers">
+      <div class="page-header">
+        <h2>Customers</h2>
+        <span class="page-count" id="customersCount">1,892</span>
+      </div>
+      <div class="search-bar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" placeholder="Search customers..." id="customersSearch" oninput="filterCustomers()">
+      </div>
+      <div class="customer-list" id="customersList"></div>
+    </div>
+
+    <!-- Settings Page -->
+    <div class="page" id="page-settings">
+      <div class="page-header">
+        <h2>Settings</h2>
+      </div>
+      <div class="settings-profile" onclick="showToast('Profile editor coming soon')">
+        <div class="profile-avatar">A</div>
+        <div class="profile-info">
+          <h3>Alex Morgan</h3>
+          <p>Administrator <span class="status-dot online"></span></p>
+        </div>
+        <div class="profile-arrow">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+      </div>
+
+      <div class="settings-group">
+        <div class="group-title">Preferences</div>
+        <div class="settings-item">
+          <div class="si-icon teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></div>
+          <div class="si-content"><h4>Dark Mode</h4><p id="darkModeLabel">Off</p></div>
+          <button class="toggle" id="darkModeToggle" onclick="toggleDarkMode()"></button>
+        </div>
+        <div class="settings-item">
+          <div class="si-icon purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div>
+          <div class="si-content"><h4>Push Notifications</h4><p>New orders, updates</p></div>
+          <button class="toggle on" onclick="this.classList.toggle('on')"></button>
+        </div>
+        <div class="settings-item">
+          <div class="si-icon amber"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+          <div class="si-content"><h4>Email Reports</h4><p>Daily summary</p></div>
+          <button class="toggle" onclick="this.classList.toggle('on')"></button>
+        </div>
+      </div>
+
+      <div class="settings-group">
+        <div class="group-title">Store</div>
+        <div class="settings-item" onclick="showToast('Store settings coming soon')">
+          <div class="si-icon purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+          <div class="si-content"><h4>Staff Management</h4><p>3 active staff</p></div>
+          <div class="si-right"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div>
+        </div>
+        <div class="settings-item" onclick="showToast('Payment settings coming soon')">
+          <div class="si-icon teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div>
+          <div class="si-content"><h4>Payment Methods</h4><p>Credit card, PayPal, Stripe</p></div>
+          <div class="si-right"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div>
+        </div>
+        <div class="settings-item" onclick="showToast('Shipping settings coming soon')">
+          <div class="si-icon amber"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></div>
+          <div class="si-content"><h4>Shipping Zones</h4><p>5 zones configured</p></div>
+          <div class="si-right"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div>
+        </div>
+      </div>
+
+      <div class="settings-group">
+        <div class="group-title">Support</div>
+        <div class="settings-item" onclick="showToast('Help center coming soon')">
+          <div class="si-icon red"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+          <div class="si-content"><h4>Help & Support</h4><p>FAQ, contact, docs</p></div>
+          <div class="si-right"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div>
+        </div>
+        <div class="settings-item" onclick="showToast('About page coming soon')">
+          <div class="si-icon purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></div>
+          <div class="si-content"><h4>About</h4><p>Version 2.4.1</p></div>
+          <div class="si-right"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Modal -->
+  <div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+    <div class="modal-content" id="modalContent" onclick="event.stopPropagation()">
+      <div class="modal-handle"></div>
+      <h3 id="modalTitle">Order Details</h3>
+      <div id="modalBody"></div>
+      <button class="modal-close" onclick="closeModal()">Close</button>
+    </div>
+  </div>
+
+  <!-- Add Item Modal -->
+  <div class="modal-overlay" id="addItemOverlay" onclick="closeAddItemModal(event)">
+    <div class="modal-content" id="addItemContent" onclick="event.stopPropagation()">
+      <div class="modal-handle"></div>
+      <h3>Add New Menu Item</h3>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div onclick="document.getElementById('itemImageInput').click()" style="width:100%;height:140px;background:var(--bg-input);border-radius:var(--radius-sm);border:2px dashed var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;position:relative">
+          <img id="itemImagePreview" style="display:none;width:100%;height:100%;object-fit:cover;position:absolute;inset:0;border-radius:10px">
+          <span id="itemImagePlaceholder" style="color:var(--text-muted);font-size:13px;font-weight:500">Tap to add photo</span>
+        </div>
+        <input type="file" id="itemImageInput" accept="image/*" style="display:none" onchange="previewItemImage(event)">
+
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <label class="form-label">Item Name</label>
+          <input type="text" id="itemNameInput" placeholder="e.g. Paneer Tikka" class="form-input">
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <label class="form-label">Category</label>
+          <select id="itemCategoryInput" class="form-select">
+            <option value="Starters">Starters</option>
+            <option value="Mains">Mains</option>
+            <option value="Drinks">Drinks</option>
+            <option value="Desserts">Desserts</option>
+          </select>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <label class="form-label">Price ($)</label>
+          <input type="number" id="itemPriceInput" placeholder="0.00" step="0.01" min="0" class="form-input">
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <label class="form-label">Description</label>
+          <textarea id="itemDescInput" placeholder="Short description..." rows="3" class="form-textarea"></textarea>
+        </div>
+
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:4px 0">
+          <span style="font-size:13px;font-weight:500">Available</span>
+          <button class="toggle on" id="itemAvailToggle" onclick="this.classList.toggle('on')"></button>
+        </div>
+
+        <div style="display:flex;gap:10px;margin-top:4px">
+          <button onclick="closeAddItemModal()" class="btn-secondary" style="flex:1">Cancel</button>
+          <button onclick="saveNewItem()" class="btn-primary" style="flex:1">Save Item</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FAB -->
+  <button class="fab" onclick="openAddItemModal()" aria-label="Add new item">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+  </button>
+
+  <!-- Bottom Navigation -->
+  <nav class="bottom-nav">
+    <button class="nav-item active" data-page="dashboard" onclick="switchPage('dashboard')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
+      <span>Dashboard</span>
+    </button>
+    <button class="nav-item" data-page="orders" onclick="switchPage('orders')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+      <span>Orders</span>
+    </button>
+    <button class="nav-item" data-page="products" onclick="switchPage('products')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.29 7 12 12 20.71 7"/><line x1="12" y1="22" x2="12" y2="12"/></svg>
+      <span>Products</span>
+    </button>
+    <button class="nav-item" data-page="customers" onclick="switchPage('customers')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      <span>Customers</span>
+    </button>
+    <button class="nav-item" data-page="settings" onclick="switchPage('settings')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      <span>Settings</span>
+    </button>
+  </nav>
+
+  <!-- Toast -->
+  <div id="toast" style="position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:var(--bg-card);color:var(--text-primary);padding:10px 20px;border-radius:10px;border:1px solid var(--border-light);font-size:13px;font-weight:500;z-index:200;display:none;box-shadow:var(--shadow-lg);backdrop-filter:blur(12px);max-width:90%;text-align:center;animation:toastIn 0.25s ease;"></div>
+</div>
+
+<script>
+// ===== DATA =====
+const orderStatuses = ['completed', 'processing', 'pending', 'cancelled'];
+const statusBadge = { completed: 'badge-success', processing: 'badge-info', pending: 'badge-warning', cancelled: 'badge-danger' };
+const statusLabel = { completed: 'Completed', processing: 'Processing', pending: 'Pending', cancelled: 'Cancelled' };
+
+const orders = [
+  { id: '#ORD-3842', customer: 'Sarah Johnson', amount: 89.90, items: 3, status: 'completed', time: '2 min ago', products: 'Butter Chicken, Naan, Mango Lassi', avatar: '#10B981', initials: 'SJ', img: 'https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?w=56&h=56&fit=crop&auto=format' },
+  { id: '#ORD-3841', customer: 'Michael Chen', amount: 145.50, items: 2, status: 'processing', time: '15 min ago', products: 'Paneer Tikka, Red Wine Bottle', avatar: '#7C5CFC', initials: 'MC', img: 'https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?w=56&h=56&fit=crop&auto=format' },
+  { id: '#ORD-3840', customer: 'Emily Rodriguez', amount: 62.00, items: 1, status: 'completed', time: '32 min ago', products: 'Chocolate Lava Cake', avatar: '#EC4899', initials: 'ER', img: 'https://images.unsplash.com/photo-1606313564200-e75d5e30476c?w=56&h=56&fit=crop&auto=format' },
+  { id: '#ORD-3839', customer: 'David Kim', amount: 234.00, items: 4, status: 'pending', time: '1h ago', products: 'Butter Chicken, Gulab Jamun, Naan, Mango Lassi', avatar: '#F59E0B', initials: 'DK', img: 'https://images.unsplash.com/photo-1595475207225-428b62bda831?w=56&h=56&fit=crop&auto=format' },
+  { id: '#ORD-3838', customer: 'Jessica Brown', amount: 47.50, items: 2, status: 'completed', time: '1h ago', products: 'Mango Lassi, Caesar Salad', avatar: '#2DD4BF', initials: 'JB', img: 'https://images.unsplash.com/photo-1621263764928-df1444c5e859?w=56&h=56&fit=crop&auto=format' },
+  { id: '#ORD-3837', customer: 'Robert Taylor', amount: 178.00, items: 5, status: 'processing', time: '2h ago', products: 'Butter Chicken, Paneer Tikka, Naan, Mango Lassi, Gulab Jamun', avatar: '#EF4444', initials: 'RT', img: 'https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?w=56&h=56&fit=crop&auto=format' },
+  { id: '#ORD-3836', customer: 'Amanda Wilson', amount: 93.25, items: 3, status: 'pending', time: '2h ago', products: 'Margherita Pizza, Caesar Salad, Mango Lassi', avatar: '#8B5CF6', initials: 'AW', img: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=56&h=56&fit=crop&auto=format' },
+  { id: '#ORD-3835', customer: 'James Martinez', amount: 156.00, items: 2, status: 'cancelled', time: '3h ago', products: 'Paneer Tikka, Red Wine Bottle', avatar: '#F97316', initials: 'JM', img: 'https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?w=56&h=56&fit=crop&auto=format' },
+  { id: '#ORD-3834', customer: 'Sophia Lee', amount: 71.80, items: 3, status: 'completed', time: '3h ago', products: 'Gulab Jamun, Mango Lassi, Caesar Salad', avatar: '#06B6D4', initials: 'SL', img: 'https://images.unsplash.com/photo-1595475207225-428b62bda831?w=56&h=56&fit=crop&auto=format' },
+  { id: '#ORD-3833', customer: 'William Garcia', amount: 210.00, items: 4, status: 'processing', time: '4h ago', products: 'Butter Chicken, Naan, Caesar Salad, Red Wine Bottle', avatar: '#D946EF', initials: 'WG', img: 'https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?w=56&h=56&fit=crop&auto=format' },
+  { id: '#ORD-3832', customer: 'Olivia Thompson', amount: 55.00, items: 1, status: 'completed', time: '4h ago', products: 'Margherita Pizza Large', avatar: '#14B8A6', initials: 'OT', img: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=56&h=56&fit=crop&auto=format' },
+  { id: '#ORD-3831', customer: 'Daniel Anderson', amount: 122.50, items: 3, status: 'pending', time: '5h ago', products: 'Chocolate Lava Cake, Gulab Jamun, Mango Lassi', avatar: '#A855F7', initials: 'DA', img: 'https://images.unsplash.com/photo-1606313564200-e75d5e30476c?w=56&h=56&fit=crop&auto=format' },
+];
+
+const products = [
+  { name: 'Margherita Pizza', category: 'Mains', price: 14.99, stock: 24, color: '#F97316', image: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=120&h=120&fit=crop&auto=format' },
+  { name: 'Paneer Tikka', category: 'Starters', price: 12.99, stock: 20, color: '#EF4444', image: 'https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?w=120&h=120&fit=crop&auto=format' },
+  { name: 'Butter Chicken', category: 'Mains', price: 18.99, stock: 15, color: '#F59E0B', image: 'https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?w=120&h=120&fit=crop&auto=format' },
+  { name: 'Chocolate Lava Cake', category: 'Desserts', price: 9.99, stock: 12, color: '#111827', image: 'https://images.unsplash.com/photo-1606313564200-e75d5e30476c?w=120&h=120&fit=crop&auto=format' },
+  { name: 'Gulab Jamun', category: 'Desserts', price: 6.99, stock: 25, color: '#16A34A', image: 'https://images.unsplash.com/photo-1595475207225-428b62bda831?w=120&h=120&fit=crop&auto=format' },
+  { name: 'Caesar Salad', category: 'Starters', price: 11.99, stock: 30, color: '#10B981', image: 'https://images.unsplash.com/photo-1546793665-c74683f339c1?w=120&h=120&fit=crop&auto=format' },
+  { name: 'Mango Lassi', category: 'Drinks', price: 5.99, stock: 30, color: '#2563EB', image: 'https://images.unsplash.com/photo-1621263764928-df1444c5e859?w=120&h=120&fit=crop&auto=format' },
+  { name: 'Red Wine Bottle', category: 'Drinks', price: 38.00, stock: 15, color: '#EF4444', image: 'https://images.unsplash.com/photo-1510818376871-4a9d54bba4c2?w=120&h=120&fit=crop&auto=format' },
+];
+
+const customers = [
+  { name: 'Sarah Johnson', email: 'sarah.j@email.com', orders: 34, spent: 2890, avatar: '#10B981', initials: 'SJ' },
+  { name: 'Michael Chen', email: 'm.chen@email.com', orders: 28, spent: 3450, avatar: '#7C5CFC', initials: 'MC' },
+  { name: 'Emily Rodriguez', email: 'emily.r@email.com', orders: 22, spent: 1870, avatar: '#EC4899', initials: 'ER' },
+  { name: 'David Kim', email: 'david.k@email.com', orders: 19, spent: 2560, avatar: '#F59E0B', initials: 'DK' },
+  { name: 'Jessica Brown', email: 'jess.b@email.com', orders: 17, spent: 1240, avatar: '#2DD4BF', initials: 'JB' },
+  { name: 'Robert Taylor', email: 'rob.t@email.com', orders: 15, spent: 2100, avatar: '#EF4444', initials: 'RT' },
+  { name: 'Amanda Wilson', email: 'amanda.w@email.com', orders: 13, spent: 980, avatar: '#8B5CF6', initials: 'AW' },
+  { name: 'Sophia Lee', email: 'sophia.l@email.com', orders: 11, spent: 760, avatar: '#06B6D4', initials: 'SL' },
+  { name: 'James Martinez', email: 'james.m@email.com', orders: 9, spent: 1580, avatar: '#F97316', initials: 'JM' },
+  { name: 'Olivia Thompson', email: 'olivia.t@email.com', orders: 8, spent: 420, avatar: '#14B8A6', initials: 'OT' },
+];
+
+// ===== CHART =====
+const chartData = [4200, 5800, 4900, 7200, 6500, 8100, 12480];
+const chartLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+const chartMax = Math.max(...chartData);
+
+function renderChart() {
+  const container = document.getElementById('revenueChart');
+  container.innerHTML = chartData.map((val, i) => {
+    const height = Math.max((val / chartMax) * 100, 4);
+    return `<div class="chart-bar-wrap">
+      <div class="chart-bar" style="height:${height}%"></div>
+      <span class="chart-bar-label">${chartLabels[i]}</span>
+    </div>`;
+  }).join('');
+}
+
+// ===== RENDER HELPERS =====
+function renderOrderItem(o, idx) {
+  return `<div class="order-item" onclick="showOrderDetail(${idx})">
+    <div class="order-avatar" style="background:${o.avatar}">
+      <img src="${o.img}" alt="${o.customer}" style="width:100%;height:100%;object-fit:cover;border-radius:10px" loading="lazy">
+    </div>
+    <div class="order-info">
+      <h4>${o.customer}</h4>
+      <p>${o.id} <span class="${statusBadge[o.status]}">${statusLabel[o.status]}</span></p>
+      <div class="order-products">${o.products}</div>
+    </div>
+    <div class="order-right">
+      <div class="order-amount">$${o.amount.toFixed(2)}</div>
+      <div class="order-time">${o.time}</div>
+    </div>
+  </div>`;
+}
+
+function renderCustomerItem(c) {
+  return `<div class="customer-item" onclick="showToast('Customer: ${c.name}')">
+    <div class="customer-avatar" style="background:${c.avatar}">${c.initials}</div>
+    <div class="customer-info">
+      <h4>${c.name}</h4>
+      <p>${c.email}</p>
+    </div>
+    <div class="customer-right">
+      <div class="customer-orders">${c.orders}</div>
+      <div class="customer-spent">$${c.spent}</div>
+    </div>
+  </div>`;
+}
+
+function renderProductItem(p) {
+  const inStock = p.stock > 10;
+  return `<div class="product-card" onclick="showToast('${p.name} - $${p.price.toFixed(2)}')">
+    <div class="product-img" style="background:${p.color}15">
+      <img src="${p.image}" alt="${p.name}" style="width:100%;height:100%;object-fit:cover" loading="lazy">
+      <span class="badge ${inStock ? 'badge-success' : 'badge-warning'} stock-badge">${p.stock} left</span>
+    </div>
+    <div class="product-body">
+      <h4>${p.name}</h4>
+      <div class="product-category">${p.category}</div>
+      <div class="product-price">$${p.price.toFixed(2)}</div>
+    </div>
+  </div>`;
+}
+
+// ===== RENDER ALL =====
+function renderRecent() {
+  const el = document.getElementById('recentOrders');
+  el.innerHTML = orders.slice(0, 5).map((o, i) => renderOrderItem(o, orders.indexOf(o))).join('');
+}
+
+function renderAllOrders(filter = 'all', search = '') {
+  const el = document.getElementById('allOrders');
+  let filtered = orders;
+  if (filter !== 'all') filtered = filtered.filter(o => o.status === filter);
+  if (search) {
+    const q = search.toLowerCase();
+    filtered = filtered.filter(o => o.customer.toLowerCase().includes(q) || o.id.toLowerCase().includes(q));
+  }
+  document.getElementById('ordersCount').textContent = filtered.length + ' orders';
+  el.innerHTML = filtered.length
+    ? filtered.map((o, i) => renderOrderItem(o, orders.indexOf(o))).join('')
+    : '<p class="text-center text-muted fs-12" style="padding:40px 0">No orders found</p>';
+}
+
+function renderAllProducts(search = '') {
+  const el = document.getElementById('productsGrid');
+  let filtered = products;
+  if (search) {
+    const q = search.toLowerCase();
+    filtered = filtered.filter(p => p.name.toLowerCase().includes(q) || p.category.toLowerCase().includes(q));
+  }
+  document.getElementById('productsCount').textContent = filtered.length + ' items';
+  el.innerHTML = filtered.length
+    ? filtered.map(p => renderProductItem(p)).join('')
+    : '<p class="text-center text-muted fs-12" style="padding:40px 0;grid-column:1/-1">No products found</p>';
+}
+
+function renderAllCustomers(search = '') {
+  const el = document.getElementById('customersList');
+  let filtered = customers;
+  if (search) {
+    const q = search.toLowerCase();
+    filtered = filtered.filter(c => c.name.toLowerCase().includes(q) || c.email.toLowerCase().includes(q));
+  }
+  document.getElementById('customersCount').textContent = filtered.length;
+  el.innerHTML = filtered.length
+    ? filtered.map(c => renderCustomerItem(c)).join('')
+    : '<p class="text-center text-muted fs-12" style="padding:40px 0">No customers found</p>';
+}
+
+// ===== NAVIGATION =====
+function switchPage(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  document.querySelector(`.nav-item[data-page="${page}"]`).classList.add('active');
+  document.getElementById('mainContent').scrollTop = 0;
+}
+
+// ===== ORDER FILTER =====
+let currentOrderFilter = 'all';
+
+function setOrderFilter(el, filter) {
+  document.querySelectorAll('#orderFilters .filter-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  currentOrderFilter = filter;
+  filterOrders();
+}
+
+function filterOrders() {
+  const search = document.getElementById('ordersSearch').value;
+  renderAllOrders(currentOrderFilter, search);
+}
+
+function filterProducts() {
+  renderAllProducts(document.getElementById('productsSearch').value);
+}
+
+function filterCustomers() {
+  renderAllCustomers(document.getElementById('customersSearch').value);
+}
+
+// ===== MODAL =====
+function showOrderDetail(idx) {
+  const o = orders[idx];
+  document.getElementById('modalTitle').textContent = o.customer;
+  document.getElementById('modalBody').innerHTML = `
+    <div class="modal-detail-row"><span class="label">Order ID</span><span class="value">${o.id}</span></div>
+    <div class="modal-detail-row"><span class="label">Status</span><span class="value"><span class="badge ${statusBadge[o.status]}">${statusLabel[o.status]}</span></span></div>
+    <div class="modal-detail-row"><span class="label">Items</span><span class="value">${o.items} items</span></div>
+    <div class="modal-detail-row"><span class="label">Amount</span><span class="value text-teal">$${o.amount.toFixed(2)}</span></div>
+    <div class="modal-detail-row"><span class="label">Products</span><span class="value" style="text-align:right;max-width:60%">${o.products}</span></div>
+    <div class="modal-detail-row"><span class="label">Time</span><span class="value">${o.time}</span></div>
+  `;
+  document.getElementById('modalOverlay').classList.add('open');
+}
+
+function closeModal(e) {
+  if (e && e.target !== e.currentTarget) return;
+  document.getElementById('modalOverlay').classList.remove('open');
+}
+
+// ===== TOAST =====
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.display = 'block';
+  clearTimeout(t._timeout);
+  t._timeout = setTimeout(() => t.style.display = 'none', 2000);
+}
+
+function showNotif() {
+  showToast('No new notifications');
+}
+
+// ===== LOGIN =====
+function login() {
+  document.getElementById('loginPage').style.display = 'none';
+  showToast('Welcome back, Chef');
+}
+
+// ===== ADD ITEM MODAL =====
+function openAddItemModal() {
+  document.getElementById('addItemOverlay').classList.add('open');
+}
+
+function closeAddItemModal(e) {
+  if (e && e.target !== e.currentTarget) return;
+  document.getElementById('addItemOverlay').classList.remove('open');
+  resetAddItemForm();
+}
+
+function previewItemImage(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    document.getElementById('itemImagePreview').src = ev.target.result;
+    document.getElementById('itemImagePreview').style.display = 'block';
+    document.getElementById('itemImagePlaceholder').style.display = 'none';
+  };
+  reader.readAsDataURL(file);
+}
+
+function saveNewItem() {
+  const name = document.getElementById('itemNameInput').value.trim();
+  const category = document.getElementById('itemCategoryInput').value;
+  const price = parseFloat(document.getElementById('itemPriceInput').value);
+  const desc = document.getElementById('itemDescInput').value.trim();
+  const available = document.getElementById('itemAvailToggle').classList.contains('on');
+  const preview = document.getElementById('itemImagePreview');
+  const imageSrc = preview.style.display !== 'none' ? preview.src : '';
+
+  if (!name || isNaN(price) || price <= 0) {
+    showToast('Please fill in item name and price');
+    return;
+  }
+
+  const newProduct = {
+    name: name,
+    category: category,
+    price: price,
+    stock: available ? 25 : 0,
+    color: '#2563EB',
+    image: imageSrc || 'https://images.unsplash.com/photo-1546069901-ba9fb7b2e4b6?w=120&h=120&fit=crop&auto=format'
+  };
+
+  products.push(newProduct);
+  renderAllProducts();
+  closeAddItemModal();
+  showToast(name + ' added to menu');
+}
+
+function resetAddItemForm() {
+  document.getElementById('itemNameInput').value = '';
+  document.getElementById('itemPriceInput').value = '';
+  document.getElementById('itemDescInput').value = '';
+  document.getElementById('itemCategoryInput').value = 'Starters';
+  document.getElementById('itemImagePreview').style.display = 'none';
+  document.getElementById('itemImagePlaceholder').style.display = 'block';
+  document.getElementById('itemImageInput').value = '';
+  const toggle = document.getElementById('itemAvailToggle');
+  if (!toggle.classList.contains('on')) toggle.classList.add('on');
+}
+
+// ===== DARK MODE =====
+function toggleDarkMode() {
+  const html = document.documentElement;
+  const toggle = document.getElementById('darkModeToggle');
+  const label = document.getElementById('darkModeLabel');
+  const isDark = html.classList.toggle('dark-mode');
+  toggle.classList.toggle('on', isDark);
+  label.textContent = isDark ? 'On' : 'Off';
+  localStorage.setItem('ox-admin-theme', isDark ? 'dark' : 'light');
+}
+
+function checkSavedTheme() {
+  const saved = localStorage.getItem('ox-admin-theme');
+  if (saved === 'dark') {
+    document.documentElement.classList.add('dark-mode');
+    document.getElementById('darkModeToggle').classList.add('on');
+    document.getElementById('darkModeLabel').textContent = 'On';
+  }
+}
+
+// ===== INIT =====
+checkSavedTheme();
+renderChart();
+renderRecent();
+renderAllOrders();
+renderAllProducts();
+renderAllCustomers();
+
+// Apply reduced motion if user prefers
+if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  document.querySelector('style').textContent += '.chart-bar, .nav-item, .order-item, .product-card, .customer-item, .settings-item, .modal-content, .fab, .header-btn, .toggle, .filter-tab { transition: none !important; animation: none !important; }';
+}
+</script>
+</body>
+</html>
