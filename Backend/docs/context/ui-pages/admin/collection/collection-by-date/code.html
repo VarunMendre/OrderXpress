@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary-container": "#0b3877",
+                        "secondary": "#5d5e64",
+                        "on-tertiary-fixed-variant": "#74340b",
+                        "surface": "#FFFFFF",
+                        "inverse-primary": "#adc6ff",
+                        "surface-bright": "#faf9ff",
+                        "on-tertiary": "#ffffff",
+                        "border": "#EDEEF1",
+                        "success": "#358F6C",
+                        "warning": "#BA864C",
+                        "accent-blue-tint": "#EAF2FF",
+                        "on-tertiary-container": "#e68e5e",
+                        "background": "#F7F8FA",
+                        "on-primary": "#ffffff",
+                        "on-secondary-container": "#616269",
+                        "on-error": "#ffffff",
+                        "on-surface": "#1a1b20",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-tint": "#3a5d9e",
+                        "on-secondary-fixed-variant": "#45474c",
+                        "tertiary-fixed": "#ffdbcb",
+                        "on-secondary-fixed": "#1a1b21",
+                        "tertiary-fixed-dim": "#ffb690",
+                        "success-container": "#E7F7EF",
+                        "primary-fixed-dim": "#adc6ff",
+                        "inverse-on-surface": "#f1f0f6",
+                        "error-container": "#ffdad6",
+                        "outline-variant": "#c4c6d2",
+                        "primary-fixed": "#d8e2ff",
+                        "surface-container-highest": "#e2e2e8",
+                        "secondary-fixed-dim": "#c6c6cd",
+                        "surface-container-high": "#e8e7ee",
+                        "tertiary": "#421800",
+                        "secondary-container": "#dfdfe6",
+                        "tertiary-container": "#642800",
+                        "text-secondary": "#7A7F8A",
+                        "on-primary-fixed": "#001a41",
+                        "surface-variant": "#e2e2e8",
+                        "inverse-surface": "#2f3035",
+                        "surface-container": "#eeedf3",
+                        "on-tertiary-fixed": "#341100",
+                        "text-primary": "#111318",
+                        "error": "#E5484D",
+                        "surface-container-low": "#f4f3f9",
+                        "secondary-fixed": "#e2e2e9",
+                        "on-background": "#1a1b20",
+                        "primary": "#002353",
+                        "on-primary-fixed-variant": "#1f4584",
+                        "on-surface-variant": "#434750",
+                        "on-secondary": "#ffffff",
+                        "warning-container": "#FDECD9",
+                        "on-primary-container": "#82a4e9",
+                        "on-error-container": "#93000a",
+                        "outline": "#747781",
+                        "surface-dim": "#dad9df"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-desktop": "24px",
+                        "gutter": "16px",
+                        "stack-sm": "8px",
+                        "card-padding": "16px",
+                        "margin-mobile": "16px",
+                        "stack-md": "16px"
+                    },
+                    "fontFamily": {
+                        "body-sm": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "headline-sm": ["Inter"],
+                        "micro": ["Inter"],
+                        "label-md": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "headline-lg-mobile": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-sm": ["12px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "headline-md": ["20px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                        "headline-sm": ["16px", {"lineHeight": "1.4", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                        "micro": ["11px", {"lineHeight": "1.4", "fontWeight": "400"}],
+                        "label-md": ["12px", {"lineHeight": "1", "fontWeight": "600"}],
+                        "body-md": ["13px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "headline-lg": ["24px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "label-sm": ["11px", {"lineHeight": "1", "fontWeight": "500"}],
+                        "headline-lg-mobile": ["20px", {"lineHeight": "24px", "fontWeight": "700"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body { font-family: 'Inter', sans-serif; }
+        .glass-effect { backdrop-filter: blur(12px); }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-background text-on-background min-h-screen pb-24 lg:pb-0 lg:pl-80">
+<!-- Top App Bar -->
+<header class="bg-surface/80 backdrop-blur-md shadow-sm flex justify-between items-center w-full px-margin-mobile h-16 z-50 sticky top-0 lg:hidden">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary" data-icon="rocket_launch">rocket_launch</span>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-primary font-bold tracking-tight">OrderXpress</h1>
+</div>
+<div class="w-10 h-10 rounded-full overflow-hidden border-2 border-primary-container">
+<img class="w-full h-full object-cover" data-alt="Manager profile" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDks_1wR_gJzLdl2nddVatO7euUMp7RWLfpLuX3KAT4S4CaB5hyTiLR0YdwCxzBaNR9EnTv7XwZBbuSj9YRzntuaijilQShng4iXnLpqICcATpA49kDFYmSBEQmi4VbPRqmXre9qTWP8CFwQGU6tEcO_o4bDk1GI9E_MKgRGVcwI3R6GByez7vPl8XjWQzcOdtFfMdSi1hVGXCHGW-4QchTTwps7QnDNg6yNPkooMR9WsE-Ld9wwy2z"/>
+</div>
+</header>
+<!-- Navigation Drawer (Web Only) -->
+<aside class="hidden lg:flex fixed left-0 top-0 h-screen w-80 bg-surface border-r border-border flex-col p-6 z-50">
+<div class="flex items-center gap-4 mb-10 px-2">
+<div class="w-12 h-12 rounded-xl bg-primary flex items-center justify-center text-on-primary">
+<span class="material-symbols-outlined" data-icon="rocket_launch">rocket_launch</span>
+</div>
+<div>
+<h2 class="font-headline-lg text-primary font-bold">OrderXpress</h2>
+<p class="text-label-md text-on-surface-variant">Merchant Panel</p>
+</div>
+</div>
+<nav class="flex-1 space-y-2">
+<a class="flex items-center gap-4 px-4 py-3 text-on-surface-variant hover:bg-surface-container-low transition-colors duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="receipt_long">receipt_long</span>
+<span class="font-body-md">Orders</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 text-on-surface-variant hover:bg-surface-container-low transition-colors duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="edit_note">edit_note</span>
+<span class="font-body-md">Menu Editor</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 bg-primary text-on-primary font-semibold rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="insert_chart">insert_chart</span>
+<span class="font-body-md">Historical Reports</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 text-on-surface-variant hover:bg-surface-container-low transition-colors duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="qr_code_scanner">qr_code_scanner</span>
+<span class="font-body-md">Scan Menu</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 text-on-surface-variant hover:bg-surface-container-low transition-colors duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-body-md">Settings</span>
+</a>
+</nav>
+<div class="mt-auto p-4 bg-surface-container rounded-xl flex items-center gap-4">
+<div class="w-10 h-10 rounded-full overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Bistro logo" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD6o-rGWx5pT8pEYhKsZaiot0aNjA5keh1xnUbIgNu2tBIpHAGPDizBFkVyGzeP1uGEi30EMtL1JVvNr9PbEVEN8K4usk4NQ5FMQBjMgzTBkDtD6_wo9P_BYJ2BoGhSj8_tU24IHfUVbWjB77xE_dw7NZl2aBtiMyL-x_sMIWrrZGxie1Cj1c6zABlNCG0km9JXZOcOA-Jdt8yImCz91XIFeipI2XoWN5gde_UyYDP4NMkq66fzkFpK"/>
+</div>
+<div>
+<p class="font-label-md text-on-surface">Le Gourmet Bistro</p>
+<p class="text-[10px] text-on-surface-variant">Live Operations</p>
+</div>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="p-4 lg:p-10 max-w-7xl mx-auto">
+<!-- Header & Date Picker -->
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
+<div>
+<h2 class="font-headline-lg text-on-surface">Historical Reports</h2>
+<p class="text-on-surface-variant font-body-sm">Deep dive into your performance and history</p>
+</div>
+<div class="flex flex-wrap items-center gap-3">
+<!-- Date Filter Bar -->
+<div class="flex items-center bg-surface border border-outline-variant rounded-lg overflow-hidden shadow-sm">
+<div class="px-3 py-2 flex items-center gap-2 border-r border-outline-variant hover:bg-surface-container-low cursor-pointer transition-colors">
+<span class="material-symbols-outlined text-primary text-sm" data-icon="calendar_today">calendar_today</span>
+<span class="text-xs font-label-md">Oct 01 - Oct 31</span>
+</div>
+<div class="px-3 py-2 flex items-center gap-2 hover:bg-surface-container-low cursor-pointer transition-colors">
+<span class="text-xs font-label-md">Last 30 Days</span>
+<span class="material-symbols-outlined text-on-surface-variant text-sm" data-icon="keyboard_arrow_down">keyboard_arrow_down</span>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<button class="bg-primary text-on-primary px-5 h-10 rounded-lg font-label-md flex items-center gap-2 hover:opacity-90 active:scale-95 transition-all shadow-md shadow-primary/20">
+<span class="material-symbols-outlined text-sm" data-icon="download">download</span>
+                        Export
+                    </button>
+<button class="w-10 h-10 rounded-lg border border-outline-variant text-on-surface-variant flex items-center justify-center hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined text-sm" data-icon="filter_list">filter_list</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Metric Bento Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-gutter mb-10">
+<div class="bg-surface p-6 rounded-xl shadow-sm border border-outline-variant">
+<p class="text-label-sm text-on-surface-variant uppercase tracking-wider mb-2">Total Collection</p>
+<div class="flex items-baseline gap-2">
+<h3 class="text-headline-lg text-primary">₹35,42,850</h3>
+<span class="text-success font-label-sm flex items-center">+12.4% <span class="material-symbols-outlined text-[10px]" data-icon="trending_up">trending_up</span></span>
+</div>
+<div class="mt-4 h-1.5 w-full bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-primary w-[75%] rounded-full"></div>
+</div>
+</div>
+<div class="bg-surface p-6 rounded-xl shadow-sm border border-outline-variant">
+<p class="text-label-sm text-on-surface-variant uppercase tracking-wider mb-2">Total Orders</p>
+<div class="flex items-baseline gap-2">
+<h3 class="text-headline-lg text-primary">1,284</h3>
+<span class="text-success font-label-sm flex items-center">+5.2% <span class="material-symbols-outlined text-[10px]" data-icon="trending_up">trending_up</span></span>
+</div>
+<div class="mt-4 h-1.5 w-full bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-primary w-[60%] rounded-full"></div>
+</div>
+</div>
+<div class="bg-surface p-6 rounded-xl shadow-sm border border-outline-variant lg:col-span-2 relative overflow-hidden">
+<div class="relative z-10">
+<p class="text-label-sm text-on-surface-variant uppercase tracking-wider mb-2">Peak Hours Performance</p>
+<div class="flex justify-between items-end h-24 gap-2">
+<div class="bg-primary/20 w-full rounded-t-sm h-[40%]"></div>
+<div class="bg-primary/40 w-full rounded-t-sm h-[60%]"></div>
+<div class="bg-primary w-full rounded-t-sm h-[100%]"></div>
+<div class="bg-primary/70 w-full rounded-t-sm h-[80%]"></div>
+<div class="bg-primary/30 w-full rounded-t-sm h-[50%]"></div>
+<div class="bg-primary/20 w-full rounded-t-sm h-[30%]"></div>
+</div>
+<div class="flex justify-between mt-2 text-[10px] font-label-md text-on-surface-variant">
+<span>12 PM</span><span>2 PM</span><span>4 PM</span><span>6 PM</span><span>8 PM</span><span>10 PM</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Transaction Table -->
+<div class="bg-surface rounded-xl shadow-sm border border-outline-variant overflow-hidden">
+<div class="p-6 flex items-center justify-between border-b border-outline-variant">
+<h4 class="font-headline-sm text-on-surface">Transactions History</h4>
+<div class="flex items-center gap-2 text-primary font-label-md cursor-pointer hover:underline">
+                    Detailed Audit <span class="material-symbols-outlined text-sm" data-icon="arrow_forward">arrow_forward</span>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low text-on-surface-variant">
+<th class="px-6 py-4 font-label-md text-xs uppercase tracking-wider">Order ID</th>
+<th class="px-6 py-4 font-label-md text-xs uppercase tracking-wider">Table / Customer</th>
+<th class="px-6 py-4 font-label-md text-xs uppercase tracking-wider">Status</th>
+<th class="px-6 py-4 font-label-md text-xs uppercase tracking-wider text-right">Items</th>
+<th class="px-6 py-4 font-label-md text-xs uppercase tracking-wider text-right">Amount</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant">
+<tr class="hover:bg-surface-container-low transition-colors cursor-pointer">
+<td class="px-6 py-4 font-body-sm font-semibold">#ORD-7241</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-primary-container/10 flex items-center justify-center text-primary font-bold text-xs">T4</div>
+<span class="font-body-sm">Table 04</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="bg-success-container text-success px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-tight inline-flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-success"></span> Paid</span>
+</td>
+<td class="px-6 py-4 text-right font-body-sm">4 Items</td>
+<td class="px-6 py-4 text-right font-body-sm font-bold">₹10,450.00</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors cursor-pointer">
+<td class="px-6 py-4 font-body-sm font-semibold">#ORD-7240</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-primary-container/10 flex items-center justify-center text-primary font-bold text-xs">T12</div>
+<span class="font-body-sm">Table 12</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="bg-success-container text-success px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-tight inline-flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-success"></span> Paid</span>
+</td>
+<td class="px-6 py-4 text-right font-body-sm">2 Items</td>
+<td class="px-6 py-4 text-right font-body-sm font-bold">₹4,800.00</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors cursor-pointer">
+<td class="px-6 py-4 font-body-sm font-semibold">#ORD-7239</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-error-container/20 flex items-center justify-center text-error font-bold text-xs">DL</div>
+<span class="font-body-sm">Delivery #82</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="bg-error-container text-error px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-tight inline-flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-error"></span> Refunded</span>
+</td>
+<td class="px-6 py-4 text-right font-body-sm">6 Items</td>
+<td class="px-6 py-4 text-right font-body-sm font-bold">₹21,000.00</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors cursor-pointer">
+<td class="px-6 py-4 font-body-sm font-semibold">#ORD-7238</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-primary-container/10 flex items-center justify-center text-primary font-bold text-xs">T1</div>
+<span class="font-body-sm">Table 01</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="bg-success-container text-success px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-tight inline-flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-success"></span> Paid</span>
+</td>
+<td class="px-6 py-4 text-right font-body-sm">1 Item</td>
+<td class="px-6 py-4 text-right font-body-sm font-bold">₹1,850.00</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors cursor-pointer">
+<td class="px-6 py-4 font-body-sm font-semibold">#ORD-7237</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-primary-container/10 flex items-center justify-center text-primary font-bold text-xs">T4</div>
+<span class="font-body-sm">Table 04</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="bg-success-container text-success px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-tight inline-flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-success"></span> Paid</span>
+</td>
+<td class="px-6 py-4 text-right font-body-sm">3 Items</td>
+<td class="px-6 py-4 text-right font-body-sm font-bold">₹8,225.00</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="p-4 bg-surface flex items-center justify-center border-t border-outline-variant">
+<button class="text-primary font-label-md flex items-center gap-2 hover:bg-primary/5 px-4 py-2 rounded-lg transition-colors">
+                    Load More History <span class="material-symbols-outlined" data-icon="expand_more">expand_more</span>
+</button>
+</div>
+</div>
+</main>
+<!-- Bottom Navigation Bar (Mobile Only) -->
+<nav class="fixed bottom-0 w-full z-50 flex justify-around items-center px-4 py-2 pb-safe bg-surface/90 backdrop-blur-xl border-t border-outline-variant shadow-lg lg:hidden">
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-5 py-1.5 active:scale-90 transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="receipt_long">receipt_long</span>
+<span class="font-label-sm text-label-sm">Orders</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-5 py-1.5 active:scale-90 transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="edit_note">edit_note</span>
+<span class="font-label-sm text-label-sm">Menu</span>
+</a>
+<a class="flex flex-col items-center justify-center text-primary px-5 py-1.5 active:scale-90 transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="insert_chart">insert_chart</span>
+<span class="font-label-sm text-label-sm">Reports</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-5 py-1.5 active:scale-90 transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-label-sm text-label-sm">Settings</span>
+</a>
+</nav>
+<!-- Export Modal Simulator -->
+<div class="fixed inset-0 bg-on-surface/40 backdrop-blur-sm z-[100] flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300" id="export-overlay">
+<div class="bg-surface w-[90%] max-w-md rounded-2xl p-8 shadow-2xl transform scale-90 transition-transform duration-300" id="export-modal">
+<div class="flex justify-between items-center mb-6">
+<h3 class="font-headline-md text-on-surface">Export Report</h3>
+<button class="text-on-surface-variant hover:text-error transition-colors" onclick="toggleExport()">
+<span class="material-symbols-outlined" data-icon="close">close</span>
+</button>
+</div>
+<p class="text-on-surface-variant font-body-sm mb-8">Choose format for the period (Oct 01 - Oct 31).</p>
+<div class="space-y-4">
+<button class="w-full flex items-center justify-between p-4 border border-outline-variant rounded-xl hover:border-primary hover:bg-primary/5 transition-all group">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-lg bg-red-100 flex items-center justify-center text-red-600">
+<span class="material-symbols-outlined" data-icon="picture_as_pdf">picture_as_pdf</span>
+</div>
+<div class="text-left">
+<p class="font-label-md text-on-surface">PDF Report</p>
+<p class="text-[10px] text-on-surface-variant">Best for presentations</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-primary opacity-0 group-hover:opacity-100 transition-opacity" data-icon="check_circle">check_circle</span>
+</button>
+<button class="w-full flex items-center justify-between p-4 border border-outline-variant rounded-xl hover:border-primary hover:bg-primary/5 transition-all group">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center text-green-600">
+<span class="material-symbols-outlined" data-icon="description">description</span>
+</div>
+<div class="text-left">
+<p class="font-label-md text-on-surface">Excel Spreadsheet (CSV)</p>
+<p class="text-[10px] text-on-surface-variant">Best for accounting</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-primary opacity-0 group-hover:opacity-100 transition-opacity" data-icon="check_circle">check_circle</span>
+</button>
+</div>
+<button class="w-full mt-8 bg-primary text-on-primary py-4 rounded-xl font-label-md hover:opacity-90 active:scale-95 transition-all" onclick="toggleExport()">
+                Download Report
+            </button>
+</div>
+</div>
+<script>
+        function toggleExport() {
+            const overlay = document.getElementById('export-overlay');
+            const modal = document.getElementById('export-modal');
+            const isHidden = overlay.classList.contains('opacity-0');
+            
+            if(isHidden) {
+                overlay.classList.remove('opacity-0', 'pointer-events-none');
+                modal.classList.remove('scale-90');
+                modal.classList.add('scale-100');
+            } else {
+                overlay.classList.add('opacity-0', 'pointer-events-none');
+                modal.classList.remove('scale-100');
+                modal.classList.add('scale-90');
+            }
+        }
+        document.querySelector('button.bg-primary').addEventListener('click', toggleExport);
+    </script>
+</body></html>

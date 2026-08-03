@@ -1,0 +1,221 @@
+<!DOCTYPE html><html class="light" lang="en" style=""><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0" name="viewport"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=block" rel="stylesheet"><script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script><script id="tailwind-config">try{
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary": "#0B3877",
+                        "primary-container": "#0b3877",
+                        "secondary": "#5d5e64",
+                        "surface": "#FFFFFF",
+                        "background": "#F7F8FA",
+                        "on-primary": "#ffffff",
+                        "on-surface": "#1a1b20",
+                        "on-surface-variant": "#434750",
+                        "border": "#EDEEF1",
+                        "success": "#358F6C",
+                        "error": "#E5484D",
+                        "outline-variant": "#c4c6d2",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container": "#eeedf3",
+                        "text-primary": "#111318",
+                        "text-secondary": "#7A7F8A",
+                        "navy-icon": "#0B3877"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "2xl": "1rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-mobile": "16px",
+                        "card-padding": "16px",
+                        "stack-sm": "8px",
+                        "stack-md": "16px",
+                        "lg": "24px",
+                        "md": "16px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "label-md": ["Inter"],
+                        "title-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-sm": ["12px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "headline-lg-mobile": ["28px", {"lineHeight": "34px", "fontWeight": "700"}],
+                        "label-md": ["12px", {"lineHeight": "1", "fontWeight": "600"}],
+                        "body-md": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "title-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}]
+                    }
+                },
+            },
+        }
+    }catch(_e){}</script></head><body class="bg-background text-on-surface font-body-md min-h-screen flex flex-col">
+    <!-- TopAppBar -->
+    <header class="bg-surface/80 backdrop-blur-md border-b border-border docked full-width top-0 sticky flex justify-between items-center w-full px-margin-mobile h-16 z-50">
+        <div class="flex items-center gap-3">
+            <span class="material-symbols-outlined text-primary text-2xl" data-icon="rocket_launch" data-original-icon="rocket_launch">rocket_launch</span>
+            <h1 class="font-bold text-xl tracking-tight text-primary">OrderXpress</h1>
+        </div>
+        <div class="flex items-center gap-4">
+            <button class="material-symbols-outlined text-on-surface" data-icon="search">search</button>
+            <div class="w-10 h-10 rounded-full bg-surface-container overflow-hidden border border-border">
+                <img class="w-full h-full object-cover" data-alt="Manager profile" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCH6HA7wVTmDuAe16iVpVhquEM87msdsK0nPp4SlKOQuTFgS-aGjaefe16kBrrgRSrQ_n8XR-IT3gz2tHhS4l93xzkoy6GamXUi9rCpnIz4H3W0MlrWKmVD2xuvOeWHOKjjw8B3sM8Bx3JsWEsATMpd3RdFkljgcVbsQ-jT993eIg025EuSoF7A8FzwkFz-Xe7a13Plbm0wz59wG8USSvfv0nCdy-EZmoUfTEo_ywKjQ5OE30_Kral3">
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 max-w-4xl mx-auto w-full px-margin-mobile py-lg">
+        <!-- Header Section -->
+        <div class="mb-lg">
+            <div class="flex items-center gap-1.5 text-success mb-2">
+                <span class="material-symbols-outlined text-[18px] fill-1" style="font-variation-settings: 'FILL' 1" data-icon="check_circle">check_circle</span>
+                <span class="font-label-md text-label-md uppercase tracking-widest">Scan Complete</span>
+            </div>
+            <h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface mb-2">Review Scanned Menu</h2>
+            <p class="text-on-surface-variant font-body-md">We've extracted 12 items from your document. Please verify the names and prices before publishing.</p>
+        </div>
+
+        <!-- Menu List Area -->
+        <div class="space-y-lg">
+            <!-- Category Group -->
+            <div class="space-y-md">
+                <div class="flex items-center justify-between">
+                    <h3 class="font-title-md text-title-md text-on-surface">Main Courses</h3>
+                    <span class="bg-primary-container/10 text-primary px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">6 Items</span>
+                </div>
+
+                <div class="space-y-md">
+                    <!-- Item Card 1 -->
+                    <div class="bg-surface rounded-2xl p-card-padding flex items-center justify-between shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-border">
+                        <div class="flex items-center gap-md flex-1 min-w-0">
+                            <div class="w-16 h-16 rounded-xl overflow-hidden bg-surface-container flex-shrink-0">
+                                <img class="w-full h-full object-cover" data-alt="Salmon" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAVzTzNrMHfRpTH4VQM5hNuVIsjcPdura7WqHmWcefd_GUEOGQ9Jil8PkOuUzbkJxVkCzYJneYleiYtESd1cLu4FF_WaITWx3rE4uxAQMD3fk-E2u_NNbN-5kCgZL8hzZDl6lopt6P2XSln1vvllnCb4nzEzidHkc_NumsQIG7IjBbyda0oj7N3x-YKbKEm9B7MmSm-7EbwOkdxppGI7FVuAHr_76icMXpvq-u4W-zlC6YMzkrqb7x4">
+                            </div>
+                            <div class="min-w-0">
+                                <h4 class="font-semibold text-on-surface truncate">Pan-Seared Atlantic Salmon</h4>
+                                <div class="flex items-center gap-2 mt-1">
+                                    <span class="text-on-surface font-bold">₹2,400</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-1 flex-shrink-0">
+                            <button class="w-10 h-10 flex items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container hover:text-primary transition-colors">
+                                <span class="material-symbols-outlined text-[20px]" data-icon="edit">edit</span>
+                            </button>
+                            <button class="w-10 h-10 flex items-center justify-center rounded-full text-on-surface-variant hover:bg-error/10 hover:text-error transition-colors" aria-label="Delete item">
+                                <span class="material-symbols-outlined text-[20px]" data-icon="delete">delete</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Item Card 2 -->
+                    <div class="bg-surface rounded-2xl p-card-padding flex items-center justify-between shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-border">
+                        <div class="flex items-center gap-md flex-1 min-w-0">
+                            <div class="w-16 h-16 rounded-xl overflow-hidden bg-surface-container flex-shrink-0">
+                                <img class="w-full h-full object-cover" data-alt="Risotto" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBzeAdm2Jpn8XDDE3Ry1zgYfv1oOOwZ4sijWbIqOpxMhGR2Br8wsAu8FGtW8jfbljsRIXhFR6I409ftaCyQLuE6izDvasZK3Eb1XGv3QsvRP7jxGMuNxBWV9Fg4zs7_a1310A8ncEL3Bv_tfVJTW4EL_II4MdLj2AAga-pRtM0RKHZtMV6GlA8mWsj_9zRo8fnbRmDop5EMPVhlBgNkrVMOM8qUQUdnCw15TBPriWRtaAIqzCJpWaBi">
+                            </div>
+                            <div class="min-w-0">
+                                <h4 class="font-semibold text-on-surface truncate">Truffle Mushroom Risotto</h4>
+                                <div class="flex items-center gap-2 mt-1">
+                                    <span class="text-on-surface font-bold">₹1,850</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-1 flex-shrink-0">
+                            <button class="w-10 h-10 flex items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container hover:text-primary transition-colors">
+                                <span class="material-symbols-outlined text-[20px]" data-icon="edit">edit</span>
+                            </button>
+                            <button class="w-10 h-10 flex items-center justify-center rounded-full text-on-surface-variant hover:bg-error/10 hover:text-error transition-colors" aria-label="Delete item">
+                                <span class="material-symbols-outlined text-[20px]" data-icon="delete">delete</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Item Card 3 (Price Missing State) -->
+                    <div class="bg-surface rounded-2xl p-card-padding flex items-center justify-between shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-error/20 bg-error/[0.02]">
+                        <div class="flex items-center gap-md flex-1 min-w-0">
+                            <div class="w-16 h-16 rounded-xl bg-surface-container flex items-center justify-center text-on-surface-variant/50 border border-border/50 flex-shrink-0">
+                                <span class="material-symbols-outlined text-[24px]" data-icon="image">image</span>
+                            </div>
+                            <div class="min-w-0">
+                                <h4 class="font-semibold text-on-surface truncate">Chef's Special Pasta</h4>
+                                <div class="flex items-center gap-3 mt-1">
+                                    <div class="flex items-center text-error font-bold">
+                                        <span class="text-sm mr-1">₹</span>
+                                        <button class="text-xs px-2 py-0.5 rounded border border-dashed border-error/50 hover:bg-error/10 transition-colors">Add Price</button>
+                                    </div>
+                                    <span class="flex items-center gap-1 text-[11px] font-bold text-error uppercase tracking-wider">
+                                        <span class="material-symbols-outlined text-[14px]" data-icon="error">error</span>
+                                        Missing Price
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-1 flex-shrink-0">
+                            <button class="w-10 h-10 flex items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container hover:text-primary transition-colors">
+                                <span class="material-symbols-outlined text-[20px]" data-icon="edit">edit</span>
+                            </button>
+                            <button class="w-10 h-10 flex items-center justify-center rounded-full text-on-surface-variant hover:bg-error/10 hover:text-error transition-colors" aria-label="Delete item">
+                                <span class="material-symbols-outlined text-[20px]" data-icon="delete">delete</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add Manual Item Button -->
+            <button class="w-full h-14 border-2 border-dashed border-border rounded-2xl flex items-center justify-center gap-3 text-on-surface-variant font-semibold hover:border-primary/40 hover:bg-primary/[0.02] hover:text-primary transition-all active:scale-[0.98]">
+                <span class="material-symbols-outlined text-primary" data-icon="add_circle">add_circle</span>
+                Add Manual Item
+            </button>
+
+            <!-- Beverages Group -->
+            <div class="space-y-md pt-4">
+                <div class="flex items-center justify-between">
+                    <h3 class="font-title-md text-title-md text-on-surface">Beverages</h3>
+                    <span class="bg-primary-container/10 text-primary px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">4 Items</span>
+                </div>
+
+                <div class="bg-surface rounded-2xl p-card-padding flex items-center justify-between shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-border">
+                    <div class="flex items-center gap-md flex-1 min-w-0">
+                        <div class="w-16 h-16 rounded-xl overflow-hidden bg-surface-container flex-shrink-0">
+                            <img class="w-full h-full object-cover" data-alt="Lemonade" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC46X2tBPDmlogr5lXGoAgaDY_IXRCdrsdWBjQTgvakZQ96JV61J-CdrjD3qPvDPm9Sd64vLylVYP4-flpbfDyfQqB0VD1Kr0i6W2npgfN2StNO6WUzQDi1NKT5wSpY5Hl2L9E0ABJDVif8qx64-ewyMSddrCQZ6GDDl1F7s1OEDh6CMCkfISi8zG_5HoHkM7jJmFF9mMVLtNO3CjCX1cCv_8EgDT9yD9-qcirE2tE8CN16zailKIRl">
+                        </div>
+                        <div class="min-w-0">
+                            <h4 class="font-semibold text-on-surface truncate">House-made Lemonade</h4>
+                            <div class="flex items-center gap-2 mt-1">
+                                <span class="text-on-surface font-bold">₹450</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-1 flex-shrink-0">
+                        <button class="w-10 h-10 flex items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container hover:text-primary transition-colors">
+                            <span class="material-symbols-outlined text-[20px]" data-icon="edit">edit</span>
+                        </button>
+                        <button class="w-10 h-10 flex items-center justify-center rounded-full text-on-surface-variant hover:bg-error/10 hover:text-error transition-colors" aria-label="Delete item">
+                            <span class="material-symbols-outlined text-[20px]" data-icon="delete">delete</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="h-32"></div>
+    </main>
+
+    <!-- Bottom Action Bar -->
+    <div class="fixed bottom-0 left-0 right-0 p-md bg-surface border-t border-border z-50 shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
+        <div class="max-w-4xl mx-auto flex items-center gap-md">
+            <button class="h-[56px] flex-1 sm:flex-none px-8 flex items-center justify-center gap-2 text-on-surface-variant hover:bg-surface-container rounded-full font-bold transition-colors">
+                <span class="material-symbols-outlined" data-icon="close">close</span>
+                Cancel
+            </button>
+            <button class="h-[56px] flex-[2] sm:flex-none sm:min-w-[280px] flex items-center justify-center gap-3 bg-black text-white rounded-full font-bold shadow-lg hover:shadow-xl hover:bg-on-surface active:scale-[0.98] transition-all"><div class="flex items-center justify-center gap-2"><span class="material-symbols-outlined text-[20px]" data-icon="publish">publish</span><span class="text-sm tracking-tight">Save &amp; Publish</span></div></button>
+        </div>
+    </div>
+
+    <script class="">
+        // Micro-interaction for item deletion</script></body></html>

@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Order Success - OrderXpress</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary-container": "#0b3877",
+                        "secondary": "#5d5e64",
+                        "on-tertiary-fixed-variant": "#74340b",
+                        "surface": "#FFFFFF",
+                        "inverse-primary": "#adc6ff",
+                        "surface-bright": "#faf9ff",
+                        "on-tertiary": "#ffffff",
+                        "border": "#EDEEF1",
+                        "success": "#358F6C",
+                        "warning": "#BA864C",
+                        "accent-blue-tint": "#EAF2FF",
+                        "on-tertiary-container": "#e68e5e",
+                        "background": "#F7F8FA",
+                        "on-primary": "#ffffff",
+                        "on-secondary-container": "#616269",
+                        "on-error": "#ffffff",
+                        "on-surface": "#1a1b20",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-tint": "#3a5d9e",
+                        "on-secondary-fixed-variant": "#45474c",
+                        "tertiary-fixed": "#ffdbcb",
+                        "on-secondary-fixed": "#1a1b21",
+                        "tertiary-fixed-dim": "#ffb690",
+                        "success-container": "#E7F7EF",
+                        "primary-fixed-dim": "#adc6ff",
+                        "inverse-on-surface": "#f1f0f6",
+                        "error-container": "#ffdad6",
+                        "outline-variant": "#c4c6d2",
+                        "primary-fixed": "#d8e2ff",
+                        "surface-container-highest": "#e2e2e8",
+                        "surface-container-high": "#e8e7ee",
+                        "tertiary": "#421800",
+                        "secondary-container": "#dfdfe6",
+                        "tertiary-container": "#642800",
+                        "text-secondary": "#7A7F8A",
+                        "on-primary-fixed": "#001a41",
+                        "surface-variant": "#e2e2e8",
+                        "inverse-surface": "#2f3035",
+                        "surface-container": "#eeedf3",
+                        "on-tertiary-fixed": "#341100",
+                        "text-primary": "#111318",
+                        "error": "#E5484D",
+                        "surface-container-low": "#f4f3f9",
+                        "secondary-fixed": "#e2e2e9",
+                        "on-background": "#1a1b20",
+                        "primary": "#002353",
+                        "on-primary-fixed-variant": "#1f4584",
+                        "on-surface-variant": "#434750",
+                        "on-secondary": "#ffffff",
+                        "warning-container": "#FDECD9",
+                        "on-primary-container": "#82a4e9",
+                        "on-error-container": "#93000a",
+                        "outline": "#747781",
+                        "surface-dim": "#dad9df"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-desktop": "24px",
+                        "gutter": "16px",
+                        "stack-sm": "8px",
+                        "card-padding": "16px",
+                        "margin-mobile": "16px",
+                        "stack-md": "16px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Inter", "sans-serif"],
+                        "headline-md": ["Inter", "sans-serif"],
+                        "headline-sm": ["Inter", "sans-serif"],
+                        "micro": ["Inter", "sans-serif"],
+                        "label-md": ["Inter", "sans-serif"],
+                        "body-md": ["Inter", "sans-serif"],
+                        "label-sm": ["Inter", "sans-serif"],
+                        "body-sm": ["Inter", "sans-serif"]
+                    },
+                    "fontSize": {
+                        "body-sm": ["12px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "headline-md": ["20px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                        "headline-sm": ["16px", {"lineHeight": "1.4", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                        "micro": ["11px", {"lineHeight": "1.4", "fontWeight": "400"}],
+                        "label-md": ["12px", {"lineHeight": "1", "fontWeight": "600"}],
+                        "body-md": ["13px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "headline-lg": ["24px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "label-sm": ["11px", {"lineHeight": "1", "fontWeight": "500"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+        .animate-float { animation: float 3s ease-in-out infinite; }
+        .glass { background: #FFFFFF; border: 1px solid #EDEEF1; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .fill-1 { font-variation-settings: 'FILL' 1; }
+        
+        .stepper-line { position: absolute; left: 19px; top: 0; bottom: 0; width: 2px; background: #e2e2e8; z-index: 0; }
+        /* Connects first two steps */
+        .stepper-progress { position: absolute; left: 19px; top: 20px; height: 50px; width: 2px; background: #358F6C; z-index: 1; }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen font-body-md overflow-x-hidden">
+<!-- Top App Bar -->
+<header class="bg-surface/90 backdrop-blur-md fixed top-0 w-full z-50 flex justify-between items-center px-margin-mobile h-16 border-b border-outline-variant/10">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-2xl fill-1" data-icon="rocket_launch">rocket_launch</span>
+<h1 class="text-headline-sm text-primary font-bold tracking-tight">OrderXpress</h1>
+</div>
+<div class="w-10 h-10 rounded-full overflow-hidden border-2 border-primary-fixed-dim bg-surface-container">
+<img alt="User Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAuol0_Je67eteuQ7Aggbttjy92TXaBlGUR_nLrlIzxaqTqNa74GI1WmjItjirEK1YoF1fZnCVTw3Ot5ZwBaIfhAGCZuztL2C_Q5BYCaW3KCEw99frvj_Ovxautk-indbOfWnqYVKbYIws6CvzGocyWsK0GQ4msLMJceGo9Eo9GWz2-B0I5mvIDbncK5pgtnmo-1CNAF4rR2q5Rgk-F2OBP_1zX_GA_AzwjRXOxz0bcjfMn89hCS_6G"/>
+</div>
+</header>
+<main class="pt-24 pb-32 px-margin-mobile max-w-lg mx-auto space-y-stack-md">
+<!-- Hero Confirmation -->
+<section class="text-center space-y-stack-md pb-stack-md">
+<div class="relative inline-block">
+<div class="w-24 h-24 bg-primary text-on-primary rounded-full flex items-center justify-center mx-auto animate-float shadow-[0_8px_24px_rgba(0,35,83,0.2)]">
+<span class="material-symbols-outlined text-5xl fill-1" data-icon="check_circle">check_circle</span>
+</div>
+<div class="absolute -top-1 -right-4 bg-success text-white text-[11px] font-bold px-2.5 py-1 rounded-full shadow-sm">LIVE</div>
+</div>
+<div class="space-y-1 pt-2">
+<h2 class="text-headline-lg text-on-surface">Order Tracking</h2>
+<p class="text-on-surface-variant text-body-md">Your meal is being handcrafted by our chefs.</p>
+</div>
+<div class="flex flex-col items-center gap-0.5 text-primary">
+<span class="text-label-sm font-bold uppercase tracking-widest opacity-60">Order ID</span>
+<span class="text-headline-md">#OX-88291</span>
+</div>
+</section>
+<!-- Vertical Progress Tracker Card -->
+<section class="glass rounded-xl p-6 shadow-sm relative">
+<div class="flex flex-col gap-8 relative">
+<div class="stepper-line"></div>
+<div class="stepper-progress"></div>
+<!-- Step 1: Completed -->
+<div class="flex gap-4 relative z-10">
+<div class="w-10 h-10 rounded-full bg-success text-white flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-xl font-bold" data-icon="check">check</span>
+</div>
+<div class="pt-1">
+<h4 class="font-bold text-success text-headline-sm">Order Confirmed</h4>
+<p class="text-body-sm text-on-surface-variant">We've received your order</p>
+</div>
+</div>
+<!-- Step 2: Active -->
+<div class="flex gap-4 relative z-10">
+<div class="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center flex-shrink-0 shadow-lg ring-4 ring-primary/10 transition-transform duration-500" id="cooking-icon">
+<span class="material-symbols-outlined text-xl fill-1" data-icon="skillet">skillet</span>
+</div>
+<div class="pt-1 flex-1">
+<div class="flex justify-between items-start">
+<h4 class="font-bold text-primary text-headline-sm">Preparing Your Food</h4>
+</div>
+<p class="text-body-sm text-on-surface-variant">Chef is working their magic</p>
+<div class="mt-3 inline-flex items-center gap-2 bg-primary-fixed/30 rounded-lg px-3 py-1.5 text-primary text-[12px] font-semibold">
+<span class="material-symbols-outlined text-sm" data-icon="timer">timer</span>
+                        Ready in ~12 mins
+                    </div>
+</div>
+</div>
+<!-- Step 3: Pending -->
+<div class="flex gap-4 relative z-10 opacity-40">
+<div class="w-10 h-10 rounded-full bg-surface-container-highest text-on-surface-variant flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-xl" data-icon="restaurant">restaurant</span>
+</div>
+<div class="pt-1">
+<h4 class="font-bold text-on-surface text-headline-sm">Ready for Table</h4>
+<p class="text-body-sm text-on-surface-variant">Service incoming shortly</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Order Summary Section -->
+<section class="glass rounded-xl overflow-hidden shadow-sm">
+<div class="px-5 py-4 border-b border-outline-variant/10 bg-surface-container-low flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-xl" data-icon="shopping_basket">shopping_basket</span>
+<h3 class="text-headline-sm text-on-surface font-bold">Order Summary</h3>
+</div>
+<div class="p-0">
+<!-- Product Item 1 -->
+<div class="flex items-center gap-4 px-5 py-4 border-b border-outline-variant/10">
+<div class="w-14 h-14 rounded-lg bg-surface-container overflow-hidden flex-shrink-0 border border-outline-variant/20">
+<img alt="Truffle Burger" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAv6LjS_R93Xk2kR2pniLccNX8OnH09h6BM-KY6btbYB64adJVuRE9arugJDpkQ4IDL-bEUt_797OI9oBtTCyjHS5QDFFuum7a9reJGm6zerHZcewvdCZgEgqQR8tVPekf_HaTR_sZ8DW6QzCn9fFH3wrP5oA4_lFDf1Pd_7FJJmtbiZQ7yeEQn3xNI1bO5sz6gGn3XlLl9IOxy5mdmsqLp4JJM1NBt__d18nXdkjPhdSfXqep26BiC"/>
+</div>
+<div class="flex-1 min-w-0">
+<h4 class="font-bold text-on-surface truncate">Truffle Umami Burger</h4>
+<p class="text-body-sm text-on-surface-variant">x1 • Medium Rare</p>
+</div>
+<div class="text-right">
+<span class="font-bold text-primary">₹1,540</span>
+</div>
+</div>
+<!-- Product Item 2 -->
+<div class="flex items-center gap-4 px-5 py-4">
+<div class="w-14 h-14 rounded-lg bg-surface-container overflow-hidden flex-shrink-0 border border-outline-variant/20">
+<img alt="Yuzu Soda" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBHcpOWz7gck88OWNyY8xtPc5E6Z6lXLyPZLBcHnpp_3WRI_TUWla_1X_8BEk4k2BxzC_1W4Ow1E7cxDArohTFQCQEKZlrwgld1g0jp2oBxIwBrcFrU1glTx6HfLI6HwQ9m-_gSu8uZLKkwrWGu2-FI1tv1O0CS7Ho0McFw77rzl7-66X7jHP6F90evOF05MYTyLJPdztpsuZw_oDWxCyIzMIwYNcJwX8wiKvhseEYsr89kfJAwLU5d"/>
+</div>
+<div class="flex-1 min-w-0">
+<h4 class="font-bold text-on-surface truncate">Yuzu Sparkling Soda</h4>
+<p class="text-body-sm text-on-surface-variant">x2 • Less Ice</p>
+</div>
+<div class="text-right">
+<span class="font-bold text-primary">₹990</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Location Card -->
+<section class="glass rounded-xl p-5 flex items-center justify-between shadow-sm">
+<div class="space-y-1">
+<span class="text-label-sm font-bold text-on-surface-variant uppercase tracking-widest">Your Location</span>
+<h3 class="text-[24px] font-extrabold text-primary">Table 14</h3>
+</div>
+<div class="p-3 bg-surface-container-low rounded-xl border border-outline-variant/30 flex items-center justify-center">
+<span class="material-symbols-outlined text-[40px] text-primary/80" data-icon="qr_code_2">qr_code_2</span>
+</div>
+</section>
+<!-- Primary Action Buttons -->
+<section class="flex flex-col gap-3 pt-4">
+<button class="bg-primary text-on-primary font-bold h-[56px] px-8 rounded-xl flex items-center justify-center gap-2 active:scale-[0.98] transition-all shadow-md">
+<span class="material-symbols-outlined" data-icon="add_circle">add_circle</span>
+            Order More
+        </button>
+<button class="bg-surface text-primary border-2 border-primary font-bold h-[56px] px-8 rounded-xl flex items-center justify-center gap-2 active:scale-[0.98] transition-all">
+<span class="material-symbols-outlined" data-icon="receipt_long">receipt_long</span>
+            View Order Receipt
+        </button>
+</section>
+</main>
+<!-- Bottom Navigation -->
+<nav class="fixed bottom-0 w-full z-50 flex justify-around items-center px-4 py-3 pb-6 bg-surface border-t border-outline-variant/20 shadow-[0_-8px_24px_rgba(0,0,0,0.04)]">
+<a class="flex flex-col items-center justify-center text-primary group" href="#">
+<span class="material-symbols-outlined mb-1 group-active:scale-90 transition-transform fill-1" data-icon="receipt_long">receipt_long</span>
+<span class="text-label-sm font-bold">Track</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant opacity-60 group" href="#">
+<span class="material-symbols-outlined mb-1 group-active:scale-90 transition-transform" data-icon="restaurant_menu">restaurant_menu</span>
+<span class="text-label-sm">Menu</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant opacity-60 group" href="#">
+<span class="material-symbols-outlined mb-1 group-active:scale-90 transition-transform" data-icon="person">person</span>
+<span class="text-label-sm">Profile</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant opacity-60 group" href="#">
+<span class="material-symbols-outlined mb-1 group-active:scale-90 transition-transform" data-icon="help">help</span>
+<span class="text-label-sm">Help</span>
+</a>
+</nav>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Pulse animation for the active step icon
+        const activeIcon = document.getElementById('cooking-icon');
+        if (activeIcon) {
+            setInterval(() => {
+                activeIcon.classList.toggle('scale-105');
+                activeIcon.classList.toggle('ring-8');
+            }, 1000);
+        }
+    });
+</script>
+</body></html>
