@@ -40,6 +40,12 @@ The implementation order should follow the API contract and data model documents
 - Generate table records
 - Generate signed QR payloads
 
+### 04A Table Session Stability
+
+- Preserve existing tables when regenerating from table count
+- Keep QR payloads and table identity stable across scans
+- Surface active session state for a table
+
 ### 05 Menu Management
 
 - Create, update, delete, and list menu items

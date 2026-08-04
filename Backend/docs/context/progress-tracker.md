@@ -2,9 +2,9 @@
 
 ## Current Status
 
-- Phase: Docs alignment for MVP backend
+- Phase: Backend foundation and payment bridge slice
 - Focus: Plain JavaScript backend, Razorpay onboarding/payment flow, API contract, and data models
-- Implementation status: Not started in code yet
+- Implementation status: Auth, onboarding, table/QR, menu, customer session/cart, checkout, and payment bridge slices implemented
 
 ---
 
@@ -15,6 +15,13 @@
 - Narrowed the product scope to MVP/prototype backend behavior
 - Captured final decisions for onboarding, QR sessions, OCR, order actions, notifications, and storage retention
 - Drafted the API contract and data model specs
+- Bootstrapped the Express app shell
+- Implemented admin auth routes and onboarding persistence
+- Added table generation, QR payload generation, and active session lookup
+- Added menu item CRUD and menu image/extraction records
+- Added customer session scan, menu access, and cart groundwork
+- Added checkout and order creation records with admin order views
+- Added Razorpay order creation, webhook verification, and cash-paid marking
 
 ---
 
@@ -32,6 +39,13 @@
 - Admin order actions are limited to accept, complete, and cancel
 - In-app notifications only for MVP
 - Menu images are retained long enough for review and re-processing
+- Auth sessions use HttpOnly cookies
+- MongoDB is the source of truth for admins, restaurants, and onboarding data
+- Table regeneration preserves existing tables instead of deleting them
+- Menu images are retained for review and re-processing
+- Customer sessions are anonymous and QR-based
+- Orders now exist as persistent records tied to carts and sessions
+- Payment records now exist and can confirm orders to paid
 
 ---
 
@@ -39,12 +53,13 @@
 
 - Whether the first implementation should include WebSocket or use SSE for live order updates
 - Whether the exact onboarding field list should follow Razorpay’s India flow or a slightly broader internal schema that can map to it
+- Whether we should add refresh sessions now or keep the 24-hour cookie only for the MVP
 
 ---
 
 ## Next Steps
 
-1. Lock the backend folder structure
-2. Implement the base Express app and shared middleware
-3. Add environment validation and database connection setup
-4. Add the auth module first
+1. Add admin order list/detail and status transitions polish
+2. Add collections reporting and in-app notifications
+3. Add validation/security hardening pass for the implemented slices
+4. Run a full phase verification pass
