@@ -5,6 +5,7 @@ const { MenuItem } = require('../models/menu-item.model');
 const { Cart } = require('../models/cart.model');
 
 async function scanSession(payload) {
+  const incomingSignature = String(payload.signature || '').trim().replace(/^['"]|['"]$/g, '');
   const table = await Table.findOne({
     _id: payload.tableId,
     restaurantId: payload.restaurantId
@@ -16,14 +17,9 @@ async function scanSession(payload) {
     throw error;
   }
 
-  const raw = JSON.stringify({
-    restaurantId: payload.restaurantId,
-    tableId: payload.tableId,
-    expiry: payload.expiry,
-    nonce: payload.nonce
-  });
-  const expected = crypto.createHmac('sha256', process.env.JWT_SECRET || '').update(raw).digest('hex');
-  if (expected !== payload.signature) {
+  const expectedSignature = String(table.qrSignature || '').trim().replace(/^['"]|['"]$/g, '');
+
+  if (!expectedSignature || expectedSignature !== incomingSignature) {
     const error = new Error('Invalid QR signature.');
     error.statusCode = 401;
     throw error;
