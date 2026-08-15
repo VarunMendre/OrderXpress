@@ -34,7 +34,13 @@ async function register(req, res, next) {
       maxAge: 24 * 60 * 60 * 1000
     });
 
-    return res.status(201).json({ success: true, data: result });
+    return res.status(201).json({
+      success: true,
+      data: result,
+      tokens: {
+        bearer: token
+      }
+    });
   } catch (error) {
     return next(error);
   }
@@ -55,7 +61,13 @@ async function login(req, res, next) {
       maxAge: 24 * 60 * 60 * 1000
     });
 
-    return res.status(200).json({ success: true, data: { admin: result.admin } });
+    return res.status(200).json({
+      success: true,
+      data: { admin: result.admin },
+      tokens: {
+        bearer: result.token
+      }
+    });
   } catch (error) {
     return next(error);
   }
