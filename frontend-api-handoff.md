@@ -2,7 +2,7 @@
 
 **Audience:** Frontend team  
 **Scope:** Backend endpoints validated during Phase 1 testing  
-**Base URL:** `http://localhost:4000`  
+**Base URL:** `https://orderxpress-1.onrender.com`  
 **Status:** MVP backend endpoints are wired and the following routes have been tested from Postman/manual flow.
 
 ---
@@ -34,7 +34,7 @@ The frontend should treat the backend as the source of truth for:
 
 For local development:
 
-- Backend runs on `http://localhost:4000`
+- Backend runs on `https://orderxpress-1.onrender.com` for deployed testing
 - MongoDB and Redis are already connected in the backend environment
 - Admin auth uses a cookie called `session`
 - Customer session APIs use `x-session-token`
@@ -45,7 +45,7 @@ For Razorpay webhook testing:
 - Example:
 
 ```text
-https://unanimatingly-noncruciform-jayleen.ngrok-free.dev/api/v1/payments/webhook/razorpay
+https://orderxpress-1.onrender.com/api/v1/payments/webhook/razorpay
 ```
 
 ---
@@ -703,6 +703,111 @@ Store:
 
 ---
 
+
+### Frontend Razorpay Checkout Flow
+
+The frontend must implement the full Razorpay Checkout success path. The backend only creates the payment order and verifies the returned signature.
+
+#### Step 1: Start payment from checkout button
+
+1. Call `POST /api/v1/payments/razorpay/order` from the admin-authenticated session.
+2. Use the returned `razorpayOrder.id` as the `order_id` passed into Razorpay Checkout.
+3. Use the returned `razorpayOrder.keyId` as the frontend Razorpay key.
+4. Open Razorpay Checkout only after a user action such as clicking "Pay Now".
+
+#### Step 2: Collect the success callback fields
+
+After a successful payment, Razorpay Checkout returns these three fields to the browser:
+
+```json
+{
+  "razorpay_order_id": "order_xxx",
+  "razorpay_payment_id": "pay_xxx",
+  "razorpay_signature": "signature_from_razorpay"
+}
+```
+
+The frontend must send those exact values to the backend verify endpoint without renaming them.
+
+#### Step 3: Verify the payment on the backend
+
+Send the success payload to:
+
+```http
+POST /api/v1/payments/razorpay/verify
+```
+
+Example body:
+
+```json
+{
+  "razorpay_order_id": "order_xxx",
+  "razorpay_payment_id": "pay_xxx",
+  "razorpay_signature": "signature_from_razorpay"
+}
+```
+
+The backend verifies the signature using the server-side `RAZORPAY_KEY_SECRET` and updates the payment/order state.
+
+#### Step 4: Treat webhook as the reliability layer
+
+The frontend does not call the webhook endpoint directly. The webhook is configured inside the Razorpay Dashboard and must point to the public ngrok URL during local development:
+
+```text
+https://orderxpress-1.onrender.com/api/v1/payments/webhook/razorpay
+```
+
+Recommended events to subscribe to:
+
+- `payment.captured`
+- `payment.failed`
+- `payment.authorized`
+- `order.paid`
+
+#### What the frontend must store
+
+Store these values after checkout success:
+
+- `orderId` from the backend checkout flow
+- `razorpayOrder.id` from the payment-create response
+- `razorpay_payment_id` from Razorpay success callback
+- `razorpay_signature` from Razorpay success callback
+
+#### What the frontend must not do
+
+- Do not invent `razorpay_payment_id` or `razorpay_signature`
+- Do not skip backend verification
+- Do not mark the order as paid before verify succeeds
+- Do not expose Razorpay secret keys in frontend code
+
+#### Suggested FE implementation sequence
+
+1. Login as admin
+2. Create or confirm the order in backend
+3. Call payment create endpoint
+4. Open Razorpay Checkout with the returned `order_id` and `keyId`
+5. Capture success callback values
+6. Call backend verify endpoint
+7. Show success UI only after backend verification returns success
+
+#### Example Razorpay Checkout payload for the frontend
+
+```js
+const options = {
+  key: razorpayOrder.keyId,
+  order_id: razorpayOrder.id,
+  amount: payment.amount,
+  currency: payment.currency,
+  name: 'OrderXpress',
+  description: 'Table order payment',
+  handler: async function (response) {
+    // response.razorpay_payment_id
+    // response.razorpay_order_id
+    // response.razorpay_signature
+  }
+};
+```
+
 ## 5.8 Payment
 
 ### `POST /api/v1/payments/razorpay/order`
@@ -763,7 +868,7 @@ Purpose:
 Webhook URL for ngrok:
 
 ```text
-https://unanimatingly-noncruciform-jayleen.ngrok-free.dev/api/v1/payments/webhook/razorpay
+https://orderxpress-1.onrender.com/api/v1/payments/webhook/razorpay
 ```
 
 Headers:
@@ -918,4 +1023,7 @@ These are not yet fully validated:
 - Razorpay webhook endpoint
 
 Everything else listed above was reported as working during manual testing.
+
+
+
 
