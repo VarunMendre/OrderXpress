@@ -3,22 +3,31 @@ import { useNavigate } from 'react-router-dom';
 import { useCustomerSession } from '../context/CustomerSessionContext';
 import { useCart } from '../context/CartContext';
 import { customerApi } from '../api/client';
-import Button from '../components/Button';
-import Card from '../components/Card';
-import Badge from '../components/Badge';
 import Spinner from '../components/Spinner';
 import './MenuScreen.css';
+
+const CATEGORY_META = {
+  starters: { icon: '🍢', color: '#F59E0B', bg: 'rgba(245,158,11,0.12)' },
+  mains: { icon: '🍛', color: '#EF4444', bg: 'rgba(239,68,68,0.1)' },
+  drinks: { icon: '🥤', color: '#2563EB', bg: 'rgba(37,99,235,0.1)' },
+  desserts: { icon: '🍰', color: '#16A34A', bg: 'rgba(22,163,74,0.1)' },
+  default: { icon: '🍽️', color: '#374151', bg: 'rgba(17,24,39,0.06)' },
+};
+
+function categoryMeta(key) {
+  const k = String(key || '').toLowerCase();
+  return CATEGORY_META[k] || CATEGORY_META.default;
+}
 
 export default function MenuScreen() {
   const navigate = useNavigate();
   const { session, status } = useCustomerSession();
-  const { cart, addItem, loading: cartLoading } = useCart();
+  const { cart, addItem, updateQuantity, loading: cartLoading } = useCart();
   const [items, setItems] = useState([]);
   const [categories, setCategories] = useState([]);
   const [activeCategory, setActiveCategory] = useState('all');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [expandedItems, setExpandedItems] = useState(new Set());
 
   useEffect(() => {
     if (status !== 'active') {
@@ -33,8 +42,9 @@ export default function MenuScreen() {
     setError(null);
     try {
       const data = await customerApi.getMenu();
-      setItems(data.items || []);
-      const cats = [...new Set((data.items || []).map((i) => i.category).filter(Boolean))];
+      const list = data.items || [];
+      setItems(list);
+      const cats = [...new Set(list.map((i) => i.category).filter(Boolean))];
       setCategories(cats);
     } catch (e) {
       setError(e.message);
@@ -53,32 +63,31 @@ export default function MenuScreen() {
     return cartItem?.quantity || 0;
   };
 
-  const handleAddToCart = async (item) => {
+  const handleAdd = async (item) => {
     try {
-      await addItem(item._id, 1);
+      await addItem(item, 1);
     } catch {
       // error handled by context
     }
   };
 
-  const handleQuantityChange = async (item, delta) => {
-    const currentQty = getCartQuantity(item._id);
-    const newQty = Math.max(0, currentQty + delta);
-    if (newQty === 0) {
-      await handleAddToCart({ ...item, _id: item._id }); // This will add then we need to remove... 
-      // Actually we need a remove function - let's use addItem with quantity 0
-    } else {
-      try {
-        await addItem(item._id, newQty);
-      } catch {
-      }
+  const handleStep = async (item, delta) => {
+    try {
+      const current = getCartQuantity(item._id);
+      await updateQuantity(item._id, current + delta);
+    } catch {
+      // error handled by context
     }
   };
+
+  const cartCount = cart?.itemCount || 0;
+  const cartTotal = cart?.total || 0;
+  const tableLabel = session?.tableId ? `Table ${session.tableId}` : '';
 
   if (loading) {
     return (
       <div className="menu-screen loading">
-        <Spinner size="large" />
+        <Spinner />
       </div>
     );
   }
@@ -87,7 +96,7 @@ export default function MenuScreen() {
     return (
       <div className="menu-screen error">
         <p>{error}</p>
-        <Button onClick={loadMenu}>Retry</Button>
+        <button className="btn-retry" onClick={loadMenu}>Retry</button>
       </div>
     );
   }
@@ -96,136 +105,114 @@ export default function MenuScreen() {
     <div className="menu-screen">
       <header className="menu-header">
         <div className="restaurant-info">
-          <h1>{session?.restaurant?.name || 'Restaurant'}</h1>
-          <p>Table {session?.table?.tableNumber || '—'}</p>
+          <h1>OrderXpress</h1>
+          {tableLabel && <p>{tableLabel}</p>}
         </div>
-        <Button
-          variant="ghost"
-          onClick={() => navigate('/cart')}
-          className="cart-button"
-        >
-          Cart
-          {cart?.itemCount > 0 && <Badge>{cart.itemCount}</Badge>}
-        </Button>
+        <button className="cart-btn" onClick={() => navigate('/cart')} aria-label="Cart">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="9" cy="21" r="1" /><circle cx="20" cy="21" r="1" />
+            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+          </svg>
+          {cartCount > 0 && <span className="cart-badge show">{cartCount}</span>}
+        </button>
       </header>
 
-      <nav className="category-tabs" role="tablist">
-        <button
-          role="tab"
-          className={activeCategory === 'all' ? 'active' : ''}
+      <nav className="category-grid">
+        <CategoryCard
+          key="all"
+          label="All"
+          count={items.length}
+          active={activeCategory === 'all'}
           onClick={() => setActiveCategory('all')}
-          aria-selected={activeCategory === 'all'}
-        >
-          All
-        </button>
+          meta={CATEGORY_META.default}
+        />
         {categories.map((cat) => (
-          <button
+          <CategoryCard
             key={cat}
-            role="tab"
-            className={activeCategory === cat ? 'active' : ''}
+            label={cat}
+            count={items.filter((i) => i.category === cat).length}
+            active={activeCategory === cat}
             onClick={() => setActiveCategory(cat)}
-            aria-selected={activeCategory === cat}
-          >
-            {cat}
-          </button>
+            meta={categoryMeta(cat)}
+          />
         ))}
       </nav>
 
-      <div className="menu-list">
+      <div className="menu-items">
         {filteredItems.length === 0 ? (
           <div className="empty-menu">
             <p>No items in this category</p>
           </div>
         ) : (
           filteredItems.map((item) => (
-            <MenuItemCard
+            <MenuItemRow
               key={item._id}
               item={item}
               quantity={getCartQuantity(item._id)}
-              onAdd={() => handleAddToCart(item)}
-              onQuantityChange={(delta) => handleQuantityChange(item, delta)}
-              expanded={expandedItems.has(item._id)}
-              onToggleExpand={() => setExpandedItems((prev) => {
-                const next = new Set(prev);
-                if (next.has(item._id)) next.delete(item._id);
-                else next.add(item._id);
-                return next;
-              })}
+              onAdd={() => handleAdd(item)}
+              onStep={(delta) => handleStep(item, delta)}
             />
           ))
         )}
       </div>
 
-      {cart?.itemCount > 0 && (
-        <div className="cart-summary-bar">
-          <div className="cart-summary-info">
-            <span>{cart.itemCount} item{cart.itemCount !== 1 ? 's' : ''}</span>
-            <span>₹{cart.totalAmount}</span>
-          </div>
-          <Button onClick={() => navigate('/cart')} className="view-cart-btn">
-            View Cart
-          </Button>
+      {cartCount > 0 && !cartLoading && (
+        <div className="bottom-cta show">
+          <button className="btn-checkout" onClick={() => navigate('/cart')}>
+            View Cart · ₹{cartTotal}
+          </button>
         </div>
       )}
     </div>
   );
 }
 
-function MenuItemCard({ item, quantity, onAdd, onQuantityChange, expanded, onToggleExpand }) {
-  const isVeg = item.isVegetarian !== false;
-  const hasDescription = item.description && item.description.trim();
-
+function CategoryCard({ label, count, active, onClick, meta }) {
   return (
-    <Card className={`menu-item ${expanded ? 'expanded' : ''}`}>
-      <div className="menu-item-main" onClick={onToggleExpand}>
-        <div className="menu-item-info">
-          <div className="menu-item-header">
-            <h3>{item.name}</h3>
-            <span className="menu-item-price">₹{item.price}</span>
-          </div>
-          {hasDescription && (
-            <p className={`menu-item-description ${!expanded ? 'truncated' : ''}`}>
-              {item.description}
-            </p>
-          )}
-          <div className="menu-item-meta">
-            {isVeg && <Badge variant="success" size="sm">Veg</Badge>}
-            {!isVeg && <Badge variant="warning" size="sm">Non-Veg</Badge>}
-            {item.category && <Badge variant="secondary" size="sm">{item.category}</Badge>}
-          </div>
-        </div>
-        <QuantityControl
-          quantity={quantity}
-          onAdd={onAdd}
-          onQuantityChange={onQuantityChange}
-        />
-      </div>
-      {expanded && hasDescription && (
-        <div className="menu-item-expanded">
-          <p>{item.description}</p>
-        </div>
-      )}
-    </Card>
+    <button className={`category-card ${active ? 'active' : ''}`} onClick={onClick}>
+      <span className="cat-icon" style={{ background: meta.bg, color: meta.color }}>{meta.icon}</span>
+      <h4>{label}</h4>
+      <p>{count} item{count !== 1 ? 's' : ''}</p>
+    </button>
   );
 }
 
-function QuantityControl({ quantity, onAdd, onQuantityChange }) {
-  if (quantity === 0) {
-    return (
-      <button className="add-button" onClick={onAdd}>
-        <span>+ Add</span>
-      </button>
-    );
-  }
+function MenuItemRow({ item, quantity, onAdd, onStep }) {
+  const isVeg = item.isVegetarian !== false;
   return (
-    <div className="quantity-control">
-      <button className="qty-btn" onClick={() => onQuantityChange(-1)} aria-label="Decrease">
-        −
-      </button>
-      <span className="qty-value">{quantity}</span>
-      <button className="qty-btn" onClick={() => onQuantityChange(1)} aria-label="Increase">
-        +
-      </button>
+    <div className="menu-item">
+      <div className="item-img">
+        {item.imageUrl ? (
+          <img src={item.imageUrl} alt={item.name} loading="lazy" />
+        ) : (
+          <span className="item-img-fallback">{isVeg ? '🥗' : '🍗'}</span>
+        )}
+      </div>
+      <div className="item-info">
+        <div className="item-title-row">
+          <h4>{item.name}</h4>
+          {isVeg ? (
+            <span className="veg-dot" title="Veg" />
+          ) : (
+            <span className="nonveg-dot" title="Non-Veg" />
+          )}
+        </div>
+        {item.description && <div className="item-desc">{item.description}</div>}
+        <div className="item-price">₹{item.price}</div>
+      </div>
+      {quantity === 0 ? (
+        <button className="item-add" onClick={onAdd} aria-label={`Add ${item.name}`}>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
+          </svg>
+        </button>
+      ) : (
+        <div className="item-qty show">
+          <button onClick={() => onStep(-1)} aria-label="Decrease">−</button>
+          <span>{quantity}</span>
+          <button onClick={() => onStep(1)} aria-label="Increase">+</button>
+        </div>
+      )}
     </div>
   );
 }

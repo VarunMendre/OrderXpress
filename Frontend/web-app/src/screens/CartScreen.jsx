@@ -70,7 +70,7 @@ export default function CartScreen() {
       <div className="cart-summary">
         <div className="summary-row">
           <span>Subtotal ({cart.itemCount} items)</span>
-          <span>₹{cart.subtotal || cart.totalAmount}</span>
+          <span>₹{cart.subtotal}</span>
         </div>
         {cart.tax && cart.tax > 0 && (
           <div className="summary-row">
@@ -78,15 +78,9 @@ export default function CartScreen() {
             <span>₹{cart.tax}</span>
           </div>
         )}
-        {cart.serviceCharge && cart.serviceCharge > 0 && (
-          <div className="summary-row">
-            <span>Service Charge</span>
-            <span>₹{cart.serviceCharge}</span>
-          </div>
-        )}
         <div className="summary-row total">
           <span>Total</span>
-          <span>₹{cart.totalAmount}</span>
+          <span>₹{cart.total}</span>
         </div>
 
         <Button onClick={handleCheckout} className="checkout-btn" size="lg">

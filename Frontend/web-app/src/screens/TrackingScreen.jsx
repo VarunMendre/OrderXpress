@@ -1,29 +1,25 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useCustomerSession } from '../context/CustomerSessionContext';
-import { customerApi, orderApi } from '../api/client';
 import Button from '../components/Button';
 import Card from '../components/Card';
 import Badge from '../components/Badge';
 import Spinner from '../components/Spinner';
 import './TrackingScreen.css';
 
-const STATUS_ORDER = ['placed', 'accepted', 'preparing', 'ready', 'served', 'completed'];
+const STATUS_FLOW = ['pending_payment', 'accepted', 'paid', 'completed'];
 const STATUS_LABELS = {
-  placed: 'Order Placed',
+  draft: 'Draft',
+  pending_payment: 'Order Placed',
   accepted: 'Order Accepted',
-  preparing: 'Preparing',
-  ready: 'Ready for Pickup',
-  served: 'Served',
+  paid: 'Payment Received',
   completed: 'Completed',
   cancelled: 'Cancelled',
 };
 const STATUS_COLORS = {
-  placed: 'secondary',
+  pending_payment: 'secondary',
   accepted: 'primary',
-  preparing: 'warning',
-  ready: 'primary',
-  served: 'success',
+  paid: 'success',
   completed: 'success',
   cancelled: 'danger',
 };
@@ -35,40 +31,33 @@ export default function TrackingScreen() {
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [polling, setPolling] = useState(false);
-
-  const fetchOrder = useCallback(async () => {
-    if (!orderId) return;
-    try {
-      const data = await orderApi.getOrder(orderId);
-      setOrder(data);
-      setError(null);
-    } catch (e) {
-      setError(e.message);
-    } finally {
-      setLoading(false);
-    }
-  }, [orderId]);
-
-  useEffect(() => {
-    fetchOrder();
-    if (!polling) {
-      setPolling(true);
-      const interval = setInterval(fetchOrder, 10000);
-      return () => {
-        clearInterval(interval);
-        setPolling(false);
-      };
-    }
-  }, [fetchOrder, polling]);
 
   useEffect(() => {
     if (!session) {
       navigate('/scan', { replace: true });
+      return;
     }
-  }, [session, navigate]);
+    try {
+      const stored = sessionStorage.getItem('orderxpress.lastOrder');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (!orderId || parsed._id === orderId || parsed.orderId === orderId) {
+          setOrder(parsed);
+          setError(null);
+          setLoading(false);
+          return;
+        }
+      }
+      setOrder(null);
+      setError('Order details are no longer available. Please contact the restaurant.');
+    } catch {
+      setError('Could not load your order.');
+    } finally {
+      setLoading(false);
+    }
+  }, [orderId, session, navigate]);
 
-  if (loading && !order) {
+  if (loading) {
     return (
       <div className="tracking-screen loading">
         <Spinner size="large" />
@@ -80,7 +69,7 @@ export default function TrackingScreen() {
     return (
       <div className="tracking-screen error">
         <p>{error}</p>
-        <Button onClick={fetchOrder}>Retry</Button>
+        <Button onClick={() => navigate('/menu')}>Back to Menu</Button>
       </div>
     );
   }
@@ -94,36 +83,42 @@ export default function TrackingScreen() {
     );
   }
 
-  const currentStatusIndex = STATUS_ORDER.indexOf(order.status);
-  const isCompleted = ['completed', 'cancelled'].includes(order.status);
+  const status = order.orderStatus || 'pending_payment';
+  const isCancelled = status === 'cancelled';
+  const isCompleted = status === 'completed';
+  const currentStatusIndex = STATUS_FLOW.indexOf(status);
 
   return (
     <div className="tracking-screen">
-      <header className="tracking-header">
-        <Button variant="ghost" size="sm" onClick={() => navigate('/menu')}>
-          ← Menu
-        </Button>
-        <h1>Order Tracking</h1>
-        <div className="order-meta">
-          <span>#{order.orderNumber || order._id?.slice(-6)}</span>
-          <span>{new Date(order.placedAt).toLocaleString()}</span>
+      <div className="success-hero">
+        <div className="success-icon">✓</div>
+        <h1>{isCancelled ? 'Order Cancelled' : isCompleted ? 'Order Completed' : 'Order Placed!'}</h1>
+        <p className="success-sub">
+          {isCancelled
+            ? 'Your order was cancelled.'
+            : isCompleted
+              ? 'Your order has been delivered. Enjoy!'
+              : 'Your order has been received by the kitchen.'}
+        </p>
+        <div className="order-ref">
+          Order <strong>#{order.orderNumber || order._id?.slice(-6)}</strong>
         </div>
-      </header>
+      </div>
 
       <Card className="status-card">
         <div className="status-timeline">
-          {STATUS_ORDER.map((status, index) => (
+          {STATUS_FLOW.map((s, index) => (
             <StatusStep
-              key={status}
-              label={STATUS_LABELS[status]}
-              status={getStepStatus(index, currentStatusIndex, order.status)}
-              isLast={index === STATUS_ORDER.length - 1}
+              key={s}
+              label={STATUS_LABELS[s]}
+              status={getStepStatus(index, currentStatusIndex, isCancelled)}
+              isLast={index === STATUS_FLOW.length - 1}
             />
           ))}
         </div>
         <div className="current-status">
-          <Badge variant={STATUS_COLORS[order.status] || 'secondary'} size="lg">
-            {STATUS_LABELS[order.status] || order.status}
+          <Badge variant={STATUS_COLORS[status] || 'secondary'}>
+            {STATUS_LABELS[status] || status}
           </Badge>
         </div>
       </Card>
@@ -134,12 +129,12 @@ export default function TrackingScreen() {
           {order.items?.map((item, idx) => (
             <div key={idx} className="order-item">
               <div className="item-info">
-                <span className="item-name">{item.name}</span>
+                <span className="item-name">{item.nameSnapshot || item.name}</span>
                 {item.notes && <span className="item-notes">{item.notes}</span>}
               </div>
               <div className="item-qty-price">
                 <span className="item-qty">×{item.quantity}</span>
-                <span className="item-price">₹{item.price * item.quantity}</span>
+                <span className="item-price">₹{(item.priceSnapshot ?? item.price) * item.quantity}</span>
               </div>
             </div>
           ))}
@@ -147,30 +142,26 @@ export default function TrackingScreen() {
         <div className="order-summary">
           <div className="summary-row">
             <span>Subtotal</span>
-            <span>₹{order.subtotal || order.totalAmount}</span>
+            <span>₹{order.subtotal}</span>
           </div>
-          {order.tax && order.tax > 0 && (
+          {order.tax > 0 && (
             <div className="summary-row">
               <span>Tax</span>
               <span>₹{order.tax}</span>
             </div>
           )}
-          {order.serviceCharge && order.serviceCharge > 0 && (
-            <div className="summary-row">
-              <span>Service Charge</span>
-              <span>₹{order.serviceCharge}</span>
-            </div>
-          )}
           <div className="summary-row total">
-            <span>Total Paid</span>
-            <span>₹{order.totalAmount}</span>
+            <span>Total</span>
+            <span>₹{order.total}</span>
           </div>
         </div>
         <div className="order-meta-details">
-          <div className="meta-item">
-            <span className="meta-label">Table</span>
-            <span className="meta-value">{order.table?.tableNumber || '—'}</span>
-          </div>
+          {order.orderType === 'dine-in' && (
+            <div className="meta-item">
+              <span className="meta-label">Table</span>
+              <span className="meta-value">{order.tableNumber || order.tableId || '—'}</span>
+            </div>
+          )}
           <div className="meta-item">
             <span className="meta-label">Payment</span>
             <span className="meta-value">
@@ -180,15 +171,15 @@ export default function TrackingScreen() {
           <div className="meta-item">
             <span className="meta-label">Payment Status</span>
             <span className="meta-value">
-              <Badge variant={order.paymentStatus === 'paid' ? 'success' : 'warning'} size="sm">
-                {order.paymentStatus}
+              <Badge variant={order.paymentStatus === 'paid' ? 'success' : 'warning'}>
+                {order.paymentStatus || 'pending'}
               </Badge>
             </span>
           </div>
         </div>
       </Card>
 
-      {isCompleted && (
+      {(isCompleted || isCancelled) && (
         <div className="completed-actions">
           <Button variant="secondary" onClick={() => navigate('/menu')}>
             Back to Menu
@@ -202,10 +193,10 @@ export default function TrackingScreen() {
   );
 }
 
-function getStepStatus(index, currentIndex, currentStatus) {
+function getStepStatus(index, currentIndex, isCancelled) {
+  if (isCancelled) return 'cancelled';
   if (index < currentIndex) return 'completed';
   if (index === currentIndex) return 'current';
-  if (currentStatus === 'cancelled' && index > currentIndex) return 'cancelled';
   return 'pending';
 }
 
@@ -215,9 +206,7 @@ function StatusStep({ label, status, isLast }) {
       <div className="step-marker">
         <div className="step-circle">
           {status === 'completed' && '✓'}
-          {status === 'current' && (
-            <div className="pulse-ring" />
-          )}
+          {status === 'current' && <div className="pulse-ring" />}
         </div>
         {!isLast && <div className="step-line" />}
       </div>

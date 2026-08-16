@@ -35,8 +35,8 @@ export default function QrScreen({ navigation }) {
     setIsGenerating(true);
     setError(null);
     try {
-      const data = await tableApi.generate({ tableCount });
-      setTables(data || []);
+      const data = await tableApi.generate(tableCount);
+      setTables(Array.isArray(data) ? data : data.items || []);
     } catch (e) {
       setError(e.message);
       console.error('Failed to generate tables:', e);
@@ -51,8 +51,10 @@ export default function QrScreen({ navigation }) {
 
   return (
     <Screen>
-      <AppHeader title="QR Code Generation" />
+      <AppHeader onBack={() => navigation.goBack()} />
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.content}>
+        <Text style={styles.pageTitle}>QR Codes</Text>
+        <Text style={styles.pageSub}>Generate table QR codes for your restaurant</Text>
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Generate Table QR Codes</Text>
           <View style={styles.formGroup}>
@@ -98,7 +100,6 @@ export default function QrScreen({ navigation }) {
                 <QrCard
                   key={table._id}
                   table={table}
-                  navigation={navigation}
                 />
               ))}
             </View>
@@ -116,9 +117,9 @@ export default function QrScreen({ navigation }) {
   );
 }
 
-function QrCard({ table, navigation }) {
-  const signature = table.qr?.signature || '—';
-  const payload = table.qr?.payload || '—';
+function QrCard({ table }) {
+  const signature = table.qrSignature || table.qr?.signature || '—';
+  const payload = table.qrPayload || table.qr?.payload || '—';
 
   return (
     <View style={styles.qrCard}>
@@ -127,17 +128,9 @@ function QrCard({ table, navigation }) {
         <Badge variant="secondary" size="sm">Active</Badge>
       </View>
       <View style={styles.qrCardPayload}>
-        <Text style={styles.payloadTitle}>Payload:</Text>
+        <Text style={styles.payloadTitle}>Scan this payload at the table:</Text>
         <Text style={styles.payloadText}>{payload}</Text>
         <Text style={styles.payloadMeta}>Signature: {signature}</Text>
-      </View>
-      <View style={styles.qrCardActions}>
-        <Button
-          variant="secondary"
-          onPress={() => navigation.navigate('OrderDetail', { tableId: table._id })}
-        >
-          View QR
-        </Button>
       </View>
     </View>
   );
@@ -151,6 +144,17 @@ const styles = StyleSheet.create({
   content: {
     padding: spacing.lg,
     paddingBottom: spacing.xl * 2,
+  },
+  pageTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: colors.textPrimary,
+    letterSpacing: -0.3,
+  },
+  pageSub: {
+    fontSize: 12,
+    color: colors.textMuted,
+    marginBottom: spacing.lg,
   },
   section: {
     marginBottom: spacing.xl,

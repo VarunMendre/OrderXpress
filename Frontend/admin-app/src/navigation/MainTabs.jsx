@@ -18,7 +18,7 @@ const Stack = createNativeStackNavigator();
 function OrdersStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="Orders" component={OrdersScreen} />
+      <Stack.Screen name="OrdersList" component={OrdersScreen} />
       <Stack.Screen name="OrderDetail" component={OrderDetailScreen} />
     </Stack.Navigator>
   );
@@ -27,7 +27,7 @@ function OrdersStack() {
 function MenuStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="Menu" component={MenuScreen} />
+      <Stack.Screen name="MenuList" component={MenuScreen} />
       <Stack.Screen name="Qr" component={QrScreen} />
     </Stack.Navigator>
   );

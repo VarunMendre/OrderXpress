@@ -3,15 +3,13 @@ import { View, Text, StyleSheet } from 'react-native';
 import { colors, typography, spacing } from '../theme';
 
 export default function OrderStatusHistory({ order }) {
-  const STATUS_ORDER = ['placed', 'accepted', 'preparing', 'ready', 'served', 'completed'];
-  const currentIndex = STATUS_ORDER.indexOf(order.status);
+  const STATUS_ORDER = ['pending_payment', 'accepted', 'paid', 'completed'];
+  const currentIndex = STATUS_ORDER.indexOf(order.orderStatus);
 
   const STATUS_LABELS = {
-    placed: 'Order Placed',
+    pending_payment: 'Placed',
     accepted: 'Accepted',
-    preparing: 'Preparing',
-    ready: 'Ready',
-    served: 'Served',
+    paid: 'Paid',
     completed: 'Completed',
     cancelled: 'Cancelled',
   };

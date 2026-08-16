@@ -1,24 +1,39 @@
 import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useAuth } from '../context/AuthContext';
 import { colors, radius, spacing, typography } from '../theme';
+import { getInitials } from '../utils/format';
 
-export default function AppHeader({ title, subtitle = 'Xpress' }) {
+export default function AppHeader({ onBack, onNotifications }) {
+  const { user } = useAuth();
+  const ownerName = user?.admin?.ownerName || 'Chef';
+
   return (
     <View style={styles.header}>
       <View style={styles.left}>
-        <View style={styles.logo}>
-          <Text style={styles.logoText}>OX</Text>
-        </View>
+        {onBack ? (
+          <Pressable style={styles.headerBtn} onPress={onBack} accessibilityLabel="Back">
+            <Ionicons name="chevron-back" size={20} color={colors.textSecondary} />
+          </Pressable>
+        ) : (
+          <View style={styles.logo}>
+            <Text style={styles.logoText}>OX</Text>
+          </View>
+        )}
         <Text style={styles.title}>
-          {title}
-          <Text style={styles.subtitle}>{subtitle}</Text>
+          Order<Text style={styles.titleSub}>Xpress</Text>
         </Text>
       </View>
-      <Pressable style={styles.headerBtn} accessibilityLabel="Notifications">
-        <Ionicons name="notifications-outline" size={20} color={colors.textSecondary} />
-        <View style={styles.notifDot} />
-      </Pressable>
+      <View style={styles.right}>
+        <Pressable style={styles.headerBtn} onPress={onNotifications} accessibilityLabel="Notifications">
+          <Ionicons name="notifications-outline" size={20} color={colors.textSecondary} />
+          <View style={styles.notifDot} />
+        </Pressable>
+        <View style={styles.avatar}>
+          <Text style={styles.avatarText}>{getInitials(ownerName)}</Text>
+        </View>
+      </View>
     </View>
   );
 }
@@ -31,8 +46,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.xl,
     paddingVertical: spacing.md,
     minHeight: 60,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
     backgroundColor: colors.background,
   },
   left: {
@@ -40,10 +53,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: spacing.md,
   },
+  right: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+  },
   logo: {
     width: 36,
     height: 36,
-    borderRadius: 10,
+    borderRadius: radius.sm,
     backgroundColor: colors.accent,
     alignItems: 'center',
     justifyContent: 'center',
@@ -56,18 +74,19 @@ const styles = StyleSheet.create({
   title: {
     ...typography.subtitle,
     fontSize: 18,
+    color: colors.textPrimary,
   },
-  titleAccent: {
+  titleSub: {
     color: colors.textMuted,
   },
   headerBtn: {
     width: 38,
     height: 38,
-    borderRadius: 10,
+    borderRadius: radius.sm,
     backgroundColor: colors.surface,
     alignItems: 'center',
     justifyContent: 'center',
-    ...shadowsSoft(),
+    ...PlatformShadow(),
   },
   notifDot: {
     position: 'absolute',
@@ -80,9 +99,22 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
     borderColor: colors.surface,
   },
+  avatar: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    backgroundColor: colors.accent,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  avatarText: {
+    color: colors.white,
+    fontSize: 12,
+    fontWeight: '700',
+  },
 });
 
-function shadowsSoft() {
+function PlatformShadow() {
   return {
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },

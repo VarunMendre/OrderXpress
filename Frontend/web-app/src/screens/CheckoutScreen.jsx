@@ -9,21 +9,24 @@ import Card from '../components/Card';
 import Spinner from '../components/Spinner';
 import './CheckoutScreen.css';
 
+const ORDER_TYPE_KEY = 'orderxpress.orderType';
+
 export default function CheckoutScreen() {
   const navigate = useNavigate();
   const { session } = useCustomerSession();
   const { cart, loading: cartLoading } = useCart();
-  const [step, setStep] = useState('details'); // details | payment | processing
-  const [paymentMethod, setPaymentMethod] = useState('online');
+  const [paymentMethod, setPaymentMethod] = useState('cash');
   const [formData, setFormData] = useState({
     customerName: '',
     phone: '',
+    tableNumber: '',
     specialInstructions: '',
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [order, setOrder] = useState(null);
-  const [razorpayOrder, setRazorpayOrder] = useState(null);
+
+  const orderType = sessionStorage.getItem(ORDER_TYPE_KEY) || 'dine-in';
 
   useEffect(() => {
     if (!session || cartLoading) return;
@@ -52,38 +55,25 @@ export default function CheckoutScreen() {
     return true;
   };
 
-  const handleNext = async () => {
-    if (!validateDetails()) return;
-    setError(null);
-    if (paymentMethod === 'cash') {
-      await placeOrder('cash');
-    } else {
-      setStep('payment');
-    }
-  };
-
-  const handleBack = () => {
-    setStep('details');
-    setError(null);
-  };
-
   const placeOrder = async (method) => {
     setLoading(true);
     setError(null);
     try {
       const orderData = {
-        orderType: 'dine-in',
+        orderType,
         paymentMethod: method,
         customerName: formData.customerName.trim(),
         phone: formData.phone.trim(),
+        tableNumber: formData.tableNumber.trim(),
         specialInstructions: formData.specialInstructions.trim(),
       };
       const data = await customerApi.checkout(orderData);
-      setOrder(data.order);
+      setOrder(data);
+      sessionStorage.setItem('orderxpress.lastOrder', JSON.stringify(data));
       if (method === 'online') {
-        await createRazorpayOrder(data.order._id, data.totalAmount);
+        await createRazorpayOrder(data._id, data.total);
       } else {
-        navigate(`/tracking/${data.order._id}`, { replace: true });
+        navigate(`/tracking/${data._id}`, { replace: true });
       }
     } catch (e) {
       setError(e.message);
@@ -95,14 +85,12 @@ export default function CheckoutScreen() {
     try {
       const data = await paymentApi.createRazorpayOrder({
         orderId,
-        amount: Math.round(amount * 100), // amount in paise
+        amount: Math.round(amount * 100),
         currency: 'INR',
       });
-      setRazorpayOrder(data.razorpayOrder);
-      setStep('processing');
       loadRazorpayScript().then(() => openRazorpayCheckout(data));
     } catch (e) {
-      setError(e.message);
+      setError(`${e.message} — please pay at the counter instead.`);
       setLoading(false);
     }
   };
@@ -119,10 +107,10 @@ export default function CheckoutScreen() {
 
   const openRazorpayCheckout = (data) => {
     const options = {
-      key: data.razorpayOrder.key_id || 'rzp_test_key', // This should come from backend
+      key: data.razorpayOrder?.keyId || 'rzp_test_key',
       amount: data.razorpayOrder.amount,
       currency: data.razorpayOrder.currency,
-      name: session?.restaurant?.name || 'OrderXpress',
+      name: 'OrderXpress',
       description: `Order #${order?.orderNumber || order?._id?.slice(-6)}`,
       order_id: data.razorpayOrder.id,
       handler: handlePaymentSuccess,
@@ -131,12 +119,12 @@ export default function CheckoutScreen() {
         contact: formData.phone,
       },
       theme: {
-        color: '#0b3877',
+        color: '#2563eb',
       },
       modal: {
         ondismiss: () => {
           setLoading(false);
-          setStep('details');
+          navigate(`/tracking/${order?._id}`, { replace: true });
         },
       },
     };
@@ -152,7 +140,7 @@ export default function CheckoutScreen() {
         razorpay_payment_id: response.razorpay_payment_id,
         razorpay_signature: response.razorpay_signature,
       });
-      navigate(`/tracking/${order._id}`, { replace: true });
+      navigate(`/tracking/${order?._id}`, { replace: true });
     } catch (e) {
       setError('Payment verification failed. Please contact support.');
       setLoading(false);
@@ -169,160 +157,128 @@ export default function CheckoutScreen() {
 
   return (
     <div className="checkout-screen">
-      <div className="checkout-progress">
-        <div className={`progress-step ${step !== 'details' ? 'completed' : ''}`}>
-          <span className="step-number">1</span>
-          <span className="step-label">Details</span>
-        </div>
-        <div className="progress-line" />
-        <div className={`progress-step ${step === 'payment' || step === 'processing' ? 'active' : ''}`}>
-          <span className="step-number">2</span>
-          <span className="step-label">Payment</span>
-        </div>
-        <div className="progress-line" />
-        <div className={`progress-step ${step === 'processing' ? 'active' : ''}`}>
-          <span className="step-number">3</span>
-          <span className="step-label">Confirm</span>
-        </div>
-      </div>
-
-      {step === 'details' && (
-        <CheckoutDetailsForm
-          formData={formData}
-          onChange={handleInputChange}
-          onNext={handleNext}
-          loading={loading}
-          error={error}
-        />
-      )}
-
-      {step === 'payment' && (
-        <PaymentMethodScreen
-          paymentMethod={paymentMethod}
-          onMethodChange={setPaymentMethod}
-          onBack={handleBack}
-          onNext={handleNext}
-          loading={loading}
-          orderTotal={cart.totalAmount}
-        />
-      )}
-
-      {step === 'processing' && (
-        <ProcessingScreen order={order} razorpayOrder={razorpayOrder} loading={loading} />
-      )}
-    </div>
-  );
-}
-
-function CheckoutDetailsForm({ formData, onChange, onNext, loading, error }) {
-  return (
-    <Card className="checkout-form">
-      <h2>Customer Details</h2>
-      {error && <div className="error-banner">{error}</div>}
-      <div className="form-group">
-        <label htmlFor="customerName">Full Name *</label>
-        <Input
-          id="customerName"
-          value={formData.customerName}
-          onChange={(e) => onChange('customerName', e.target.value)}
-          placeholder="Enter your name"
-          autoComplete="name"
-        />
-      </div>
-      <div className="form-group">
-        <label htmlFor="phone">Phone Number *</label>
-        <Input
-          id="phone"
-          type="tel"
-          value={formData.phone}
-          onChange={(e) => onChange('phone', e.target.value)}
-          placeholder="10-digit mobile number"
-          autoComplete="tel"
-          maxLength={10}
-        />
-      </div>
-      <div className="form-group">
-        <label htmlFor="specialInstructions">Special Instructions (optional)</label>
-        <Input
-          id="specialInstructions"
-          value={formData.specialInstructions}
-          onChange={(e) => onChange('specialInstructions', e.target.value)}
-          placeholder="e.g., Less spicy, no onions, extra napkins"
-          autoComplete="off"
-        />
-      </div>
-      <Button onClick={onNext} loading={loading} className="submit-btn" size="lg">
-        Continue to Payment
-      </Button>
-    </Card>
-  );
-}
-
-function PaymentMethodScreen({ paymentMethod, onMethodChange, onBack, onNext, loading, orderTotal }) {
-  return (
-    <Card className="checkout-form">
-      <div className="screen-header">
-        <Button variant="ghost" size="sm" onClick={onBack}>
-          ← Back
+      <header className="checkout-header">
+        <Button variant="ghost" size="sm" onClick={() => navigate('/cart')}>
+          ← Cart
         </Button>
-        <h2>Payment Method</h2>
-      </div>
-      <p className="order-total">Total: <strong>₹{orderTotal}</strong></p>
-      <div className="payment-options">
-        <label className={`payment-option ${paymentMethod === 'online' ? 'selected' : ''}`}>
-          <input
-            type="radio"
-            name="paymentMethod"
-            value="online"
-            checked={paymentMethod === 'online'}
-            onChange={() => onMethodChange('online')}
-          />
-          <div className="option-content">
-            <span className="option-icon">💳</span>
-            <div>
-              <strong>Online Payment</strong>
-              <span>Pay via Razorpay (UPI, Cards, Net Banking)</span>
-            </div>
-          </div>
-        </label>
-        <label className={`payment-option ${paymentMethod === 'cash' ? 'selected' : ''}`}>
-          <input
-            type="radio"
-            name="paymentMethod"
-            value="cash"
-            checked={paymentMethod === 'cash'}
-            onChange={() => onMethodChange('cash')}
-          />
-          <div className="option-content">
-            <span className="option-icon">💵</span>
-            <div>
-              <strong>Pay at Counter</strong>
-              <span>Pay with cash when your order is ready</span>
-            </div>
-          </div>
-        </label>
-      </div>
-      <Button onClick={onNext} loading={loading} className="submit-btn" size="lg">
-        {paymentMethod === 'online' ? 'Pay Online' : 'Place Order'}
-      </Button>
-    </Card>
-  );
-}
+        <h1>Checkout</h1>
+      </header>
 
-function ProcessingScreen({ order, razorpayOrder, loading }) {
-  return (
-    <Card className="checkout-form processing">
-      <div className="processing-icon">
-        <div className="spinner" />
+      <div className="checkout-tag">
+        <span className="tag-icon">{orderType === 'takeaway' ? '🛍️' : '🍽️'}</span>
+        {orderType === 'takeaway' ? 'Take Away' : 'Dine In'}
       </div>
-      <h2>Processing Payment</h2>
-      <p>Please complete the payment in the Razorpay window</p>
-      {razorpayOrder && (
-        <div className="order-ref">
-          Order: <strong>#{order?.orderNumber || order?._id?.slice(-6)}</strong>
+
+      <Card className="checkout-form">
+        {error && <div className="error-banner">{error}</div>}
+        <div className="form-group">
+          <label htmlFor="customerName">Name *</label>
+          <Input
+            id="customerName"
+            value={formData.customerName}
+            onChange={(e) => handleInputChange('customerName', e.target.value)}
+            placeholder="Enter your name"
+            autoComplete="name"
+          />
         </div>
-      )}
-      {loading && <Spinner size="large" />}
-    </Card>
+        {orderType === 'dine-in' && (
+          <div className="form-group">
+            <label htmlFor="tableNumber">Table Number</label>
+            <Input
+              id="tableNumber"
+              value={formData.tableNumber}
+              onChange={(e) => handleInputChange('tableNumber', e.target.value)}
+              placeholder="e.g., 12"
+              autoComplete="off"
+            />
+          </div>
+        )}
+        <div className="form-group">
+          <label htmlFor="phone">Phone Number *</label>
+          <Input
+            id="phone"
+            type="tel"
+            value={formData.phone}
+            onChange={(e) => handleInputChange('phone', e.target.value)}
+            placeholder="10-digit mobile number"
+            autoComplete="tel"
+            maxLength={10}
+          />
+        </div>
+        <div className="form-group">
+          <label htmlFor="specialInstructions">Special Instructions (optional)</label>
+          <Input
+            id="specialInstructions"
+            value={formData.specialInstructions}
+            onChange={(e) => handleInputChange('specialInstructions', e.target.value)}
+            placeholder="e.g., Less spicy, no onions"
+            autoComplete="off"
+          />
+        </div>
+
+        <div className="order-summary">
+          <h3>Order Summary</h3>
+          {cart.items.map((item) => (
+            <div className="summary-line" key={item.menuItemId}>
+              <span>{item.name} ×{item.quantity}</span>
+              <span>₹{item.price * item.quantity}</span>
+            </div>
+          ))}
+          <div className="summary-line muted">
+            <span>Subtotal</span>
+            <span>₹{cart.subtotal}</span>
+          </div>
+          {cart.tax > 0 && (
+            <div className="summary-line muted">
+              <span>Tax</span>
+              <span>₹{cart.tax}</span>
+            </div>
+          )}
+          <div className="summary-line total">
+            <span>Total</span>
+            <span>₹{cart.total}</span>
+          </div>
+        </div>
+
+        <div className="payment-options">
+          <label className={`payment-option ${paymentMethod === 'cash' ? 'selected' : ''}`}>
+            <input
+              type="radio"
+              name="paymentMethod"
+              value="cash"
+              checked={paymentMethod === 'cash'}
+              onChange={() => setPaymentMethod('cash')}
+            />
+            <div className="option-content">
+              <span className="option-icon">💵</span>
+              <div>
+                <strong>Pay at Counter</strong>
+                <span>Pay with cash when your order is ready</span>
+              </div>
+            </div>
+          </label>
+          <label className={`payment-option ${paymentMethod === 'online' ? 'selected' : ''}`}>
+            <input
+              type="radio"
+              name="paymentMethod"
+              value="online"
+              checked={paymentMethod === 'online'}
+              onChange={() => setPaymentMethod('online')}
+            />
+            <div className="option-content">
+              <span className="option-icon">💳</span>
+              <div>
+                <strong>Online Payment</strong>
+                <span>Pay via Razorpay (UPI, Cards, Net Banking)</span>
+              </div>
+            </div>
+          </label>
+        </div>
+
+        <Button onClick={() => placeOrder(paymentMethod)} loading={loading} className="submit-btn" size="lg">
+          Place Order · ₹{cart.total}
+        </Button>
+      </Card>
+    </div>
   );
 }

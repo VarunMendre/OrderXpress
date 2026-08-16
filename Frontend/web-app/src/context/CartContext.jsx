@@ -4,6 +4,27 @@ import { useCustomerSession } from './CustomerSessionContext';
 
 const CartContext = createContext(null);
 
+const EMPTY_CART = { items: [], subtotal: 0, tax: 0, total: 0, itemCount: 0 };
+
+function normalizeCart(data) {
+  const items = (data?.items || []).map((i) => ({
+    menuItemId: i.menuItemId,
+    name: i.nameSnapshot || i.name,
+    price: i.priceSnapshot ?? i.price,
+    quantity: i.quantity || 0,
+    notes: i.notes || '',
+  }));
+  const subtotal = data?.subtotal ?? items.reduce((s, i) => s + i.price * i.quantity, 0);
+  const tax = data?.tax || 0;
+  return {
+    items,
+    subtotal,
+    tax,
+    total: data?.total ?? subtotal + tax,
+    itemCount: items.reduce((s, i) => s + i.quantity, 0),
+  };
+}
+
 export function CartProvider({ children }) {
   const { status } = useCustomerSession();
   const [cart, setCart] = useState(null);
@@ -13,14 +34,17 @@ export function CartProvider({ children }) {
   const fetchCart = useCallback(async () => {
     if (status !== 'active') {
       setCart(null);
-      return;
+      return null;
     }
     setLoading(true);
     try {
       const data = await customerApi.getCart();
-      setCart(data);
+      const normalized = normalizeCart(data);
+      setCart(normalized);
+      return normalized;
     } catch (e) {
       setError(e.message);
+      return null;
     } finally {
       setLoading(false);
     }
@@ -30,13 +54,24 @@ export function CartProvider({ children }) {
     fetchCart();
   }, [fetchCart]);
 
-  const addItem = useCallback(async (menuItemId, quantity = 1, notes = '') => {
+  const syncCart = useCallback(async (nextItems) => {
     setLoading(true);
     setError(null);
     try {
-      const data = await customerApi.addCartItem({ menuItemId, quantity, notes });
-      setCart(data);
-      return data;
+      await customerApi.clearCart();
+      for (const item of nextItems) {
+        if (item.quantity > 0) {
+          await customerApi.addCartItem({
+            menuItemId: item.menuItemId,
+            quantity: item.quantity,
+            notes: item.notes || '',
+          });
+        }
+      }
+      const data = await customerApi.getCart();
+      const normalized = normalizeCart(data);
+      setCart(normalized);
+      return normalized;
     } catch (e) {
       setError(e.message);
       throw e;
@@ -45,31 +80,43 @@ export function CartProvider({ children }) {
     }
   }, []);
 
-  const removeItem = useCallback(async (menuItemId) => {
-    setLoading(true);
-    setError(null);
-    try {
-      await customerApi.addCartItem({ menuItemId, quantity: 0 });
-      await fetchCart();
-    } catch (e) {
-      setError(e.message);
-      throw e;
-    } finally {
-      setLoading(false);
+  const addItem = useCallback(async (item, quantity = 1, notes = '') => {
+    const current = cart?.items || [];
+    const existing = current.find((i) => i.menuItemId === item._id);
+    let next;
+    if (existing) {
+      next = current.map((i) =>
+        i.menuItemId === item._id ? { ...i, quantity: i.quantity + quantity } : i
+      );
+    } else {
+      next = [...current, { menuItemId: item._id, name: item.name, price: item.price, quantity, notes }];
     }
-  }, [fetchCart]);
+    return syncCart(next);
+  }, [cart, syncCart]);
 
   const updateQuantity = useCallback(async (menuItemId, quantity) => {
-    if (quantity <= 0) return removeItem(menuItemId);
-    return addItem(menuItemId, quantity);
-  }, [addItem, removeItem]);
+    const current = cart?.items || [];
+    if (quantity <= 0) {
+      const next = current.filter((i) => i.menuItemId !== menuItemId);
+      return syncCart(next);
+    }
+    const next = current.map((i) =>
+      i.menuItemId === menuItemId ? { ...i, quantity } : i
+    );
+    return syncCart(next);
+  }, [cart, syncCart]);
+
+  const removeItem = useCallback(async (menuItemId) => {
+    const next = (cart?.items || []).filter((i) => i.menuItemId !== menuItemId);
+    return syncCart(next);
+  }, [cart, syncCart]);
 
   const clearCart = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
       await customerApi.clearCart();
-      setCart({ items: [], totalAmount: 0, itemCount: 0 });
+      setCart(EMPTY_CART);
     } catch (e) {
       setError(e.message);
       throw e;
@@ -80,7 +127,7 @@ export function CartProvider({ children }) {
 
   return (
     <CartContext.Provider
-      value={{ cart, loading, error, fetchCart, addItem, removeItem, updateQuantity, clearCart }}
+      value={{ cart, loading, error, fetchCart, addItem, updateQuantity, removeItem, clearCart }}
     >
       {children}
     </CartContext.Provider>

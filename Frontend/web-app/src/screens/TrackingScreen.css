@@ -5,6 +5,53 @@
   padding-bottom: 100px;
 }
 
+.success-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 20px 16px 24px;
+}
+
+.success-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--color-success-tint);
+  color: var(--color-success);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  font-weight: 800;
+  margin-bottom: 12px;
+}
+
+.success-hero h1 {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--color-text-primary);
+  margin-bottom: 4px;
+}
+
+.success-sub {
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+  margin-bottom: 10px;
+}
+
+.order-ref {
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+  background: var(--color-surface-hover);
+  padding: 6px 14px;
+  border-radius: var(--radius-pill);
+}
+
+.order-ref strong {
+  color: var(--color-text-primary);
+}
+
 .tracking-screen.loading,
 .tracking-screen.error,
 .tracking-screen.empty {

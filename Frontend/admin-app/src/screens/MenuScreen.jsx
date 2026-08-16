@@ -1,27 +1,52 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Switch } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  Pressable,
+  TextInput,
+  Image,
+  Alert,
+} from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { Picker } from '@react-native-picker/picker';
 import { useAuth } from '../context/AuthContext';
 import { menuApi } from '../api/admin';
 import Screen from '../components/Screen';
 import AppHeader from '../components/AppHeader';
-import { Button, Input, Badge } from '../components';
+import PageHeader from '../components/PageHeader';
+import BottomSheet from '../components/BottomSheet';
+import Toggle from '../components/Toggle';
+import { Button, Badge } from '../components';
 import Spinner from '../components/Spinner';
-import { colors, spacing, radius, typography } from '../theme';
+import { colors, spacing, radius, shadows } from '../theme';
+import { formatCurrency } from '../utils/format';
+
+const FALLBACK_EMOJI = {
+  Starters: '🥗',
+  Mains: '🍛',
+  Drinks: '🥤',
+  Desserts: '🍰',
+};
+
+const DEFAULT_CATEGORIES = ['Starters', 'Mains', 'Drinks', 'Desserts'];
 
 export default function MenuScreen() {
   const { user } = useAuth();
   const [items, setItems] = useState([]);
-  const [isCreating, setIsCreating] = useState(false);
-  const [isUpdating, setIsUpdating] = useState(false);
-  const [deletingItemId, setDeletingItemId] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sheetOpen, setSheetOpen] = useState(false);
   const [editingItemId, setEditingItemId] = useState(null);
-  const [selectedCategory, setSelectedCategory] = useState('');
-  const [categories, setCategories] = useState([]);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [categories, setCategories] = useState(DEFAULT_CATEGORIES);
 
   const [formData, setFormData] = useState({
     name: '',
     price: '',
-    category: '',
+    category: 'Starters',
     isVegetarian: false,
     portionType: 'full',
     description: '',
@@ -35,105 +60,25 @@ export default function MenuScreen() {
   }, [user]);
 
   const fetchMenuItems = async () => {
+    setIsLoading(true);
     try {
       const data = await menuApi.list();
-      setItems(data.items || []);
-      const cats = [...new Set((data.items || []).map((i) => i.category).filter(Boolean))];
-      setCategories(cats);
+      const list = Array.isArray(data) ? data : data.items || [];
+      setItems(list);
+      const cats = [...new Set(list.map((i) => i.category).filter(Boolean))];
+      setCategories([...DEFAULT_CATEGORIES, ...cats.filter((c) => !DEFAULT_CATEGORIES.includes(c))]);
     } catch (e) {
       console.error('Failed to fetch menu items:', e);
-    }
-  };
-
-  const handleInputChange = (field, value) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
-  };
-
-  const onSubmit = async () => {
-    if (!formData.name || !formData.price || !formData.category || !formData.portionType) {
-      Alert.alert('Error', 'Please fill all required fields');
-      return;
-    }
-    setIsCreating(true);
-    try {
-      await menuApi.create({
-        name: formData.name,
-        price: Number(formData.price),
-        category: formData.category,
-        isVegetarian: formData.isVegetarian,
-        portionType: formData.portionType,
-        description: formData.description,
-        isAvailable: formData.isAvailable,
-      });
-      resetForm();
-      fetchMenuItems();
-    } catch (e) {
-      console.error('Failed to create menu item:', e);
-      Alert.alert('Error', 'Failed to create item');
     } finally {
-      setIsCreating(false);
+      setIsLoading(false);
     }
-  };
-
-  const onUpdateSubmit = async () => {
-    setIsUpdating(true);
-    try {
-      await menuApi.update(editingItemId, {
-        name: formData.name,
-        price: Number(formData.price),
-        category: formData.category,
-        isVegetarian: formData.isVegetarian,
-        portionType: formData.portionType,
-        description: formData.description,
-        isAvailable: formData.isAvailable,
-      });
-      setEditingItemId(null);
-      resetForm();
-      fetchMenuItems();
-    } catch (e) {
-      console.error('Failed to update menu item:', e);
-      Alert.alert('Error', 'Failed to update item');
-    } finally {
-      setIsUpdating(false);
-    }
-  };
-
-  const handleDelete = async (itemId) => {
-    Alert.alert('Delete Item', 'Are you sure you want to delete this item?', [
-      { text: 'Cancel', style: 'cancel' },
-      { text: 'Delete', style: 'destructive', onPress: async () => {
-        setDeletingItemId(itemId);
-        try {
-          await menuApi.delete(itemId);
-          fetchMenuItems();
-        } catch (e) {
-          console.error('Failed to delete menu item:', e);
-        } finally {
-          setDeletingItemId(null);
-        }
-      }},
-    ]);
-  };
-
-  const handleEdit = (item) => {
-    setEditingItemId(item._id);
-    setFormData({
-      name: item.name,
-      price: String(item.price),
-      category: item.category,
-      isVegetarian: item.isVegetarian || false,
-      portionType: item.portionType || 'full',
-      description: item.description || '',
-      isAvailable: item.isAvailable !== false,
-    });
   };
 
   const resetForm = () => {
-    setEditingItemId(null);
     setFormData({
       name: '',
       price: '',
-      category: '',
+      category: 'Starters',
       isVegetarian: false,
       portionType: 'full',
       description: '',
@@ -141,174 +86,264 @@ export default function MenuScreen() {
     });
   };
 
-  const filteredItems = selectedCategory
-    ? items.filter((i) => i.category === selectedCategory)
-    : items;
+  const openCreate = () => {
+    setEditingItemId(null);
+    resetForm();
+    setSheetOpen(true);
+  };
+
+  const openEdit = (item) => {
+    setEditingItemId(item._id);
+    setFormData({
+      name: item.name,
+      price: String(item.price),
+      category: item.category || 'Starters',
+      isVegetarian: item.isVegetarian || false,
+      portionType: item.portionType || 'full',
+      description: item.description || '',
+      isAvailable: item.isAvailable !== false,
+    });
+    setSheetOpen(true);
+  };
+
+  const handleSave = async () => {
+    if (!formData.name.trim() || !formData.price || Number(formData.price) <= 0) {
+      Alert.alert('Error', 'Please fill in item name and price');
+      return;
+    }
+    setIsSaving(true);
+    const payload = {
+      name: formData.name.trim(),
+      price: Number(formData.price),
+      category: formData.category,
+      isVegetarian: formData.isVegetarian,
+      portionType: formData.portionType,
+      description: formData.description.trim(),
+      isAvailable: formData.isAvailable,
+    };
+    try {
+      if (editingItemId) {
+        await menuApi.update(editingItemId, payload);
+      } else {
+        await menuApi.create(payload);
+      }
+      setSheetOpen(false);
+      fetchMenuItems();
+    } catch (e) {
+      console.error('Failed to save menu item:', e);
+      Alert.alert('Error', 'Failed to save item');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleDelete = () => {
+    Alert.alert('Delete Item', 'Are you sure you want to delete this item?', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Delete',
+        style: 'destructive',
+        onPress: async () => {
+          setIsDeleting(true);
+          try {
+            await menuApi.delete(editingItemId);
+            setSheetOpen(false);
+            fetchMenuItems();
+          } catch (e) {
+            console.error('Failed to delete menu item:', e);
+            Alert.alert('Error', 'Failed to delete item');
+          } finally {
+            setIsDeleting(false);
+          }
+        },
+      },
+    ]);
+  };
 
   if (!user) {
     return null;
   }
 
+  const q = searchQuery.trim().toLowerCase();
+  const visibleItems = q
+    ? items.filter(
+        (i) =>
+          i.name.toLowerCase().includes(q) || (i.category || '').toLowerCase().includes(q)
+      )
+    : items;
+
   return (
     <Screen>
-      <AppHeader title="Menu Management" />
+      <AppHeader onNotifications={() => {}} />
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.content}>
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Filters</Text>
-          <View style={styles.filterRow}>
-            {categories.map((cat) => (
-              <TouchableOpacity
-                key={cat}
-                style={[
-                  styles.filterButton,
-                  selectedCategory === cat && styles.filterButtonActive,
-                ]}
-                onPress={() => setSelectedCategory(cat)}
-              >
-                <Text style={[
-                  styles.filterButtonText,
-                  selectedCategory === cat && styles.filterButtonTextActive,
-                ]}>
-                  {cat}
-                </Text>
-              </TouchableOpacity>
-            ))}
-            <TouchableOpacity
-              style={[
-                styles.filterButton,
-                !selectedCategory && styles.filterButtonActive,
-              ]}
-              onPress={() => setSelectedCategory('')}
-            >
-              <Text style={[
-                styles.filterButtonText,
-                !selectedCategory && styles.filterButtonTextActive,
-              ]}>
-                All
-              </Text>
-            </TouchableOpacity>
-          </View>
+        <PageHeader
+          title="Products"
+          sub={`${visibleItems.length} items`}
+          right={
+            <Pressable style={styles.addBtn} onPress={openCreate}>
+              <Ionicons name="add" size={16} color={colors.white} />
+              <Text style={styles.addBtnText}>Add Item</Text>
+            </Pressable>
+          }
+        />
+
+        <View style={styles.searchBar}>
+          <Ionicons name="search-outline" size={18} color={colors.textMuted} />
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Search menu"
+            placeholderTextColor={colors.textMuted}
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            autoCapitalize="none"
+          />
         </View>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>
-            {editingItemId ? 'Edit Menu Item' : 'Add New Item'}
-          </Text>
-          <Input
-            value={formData.name}
-            onChangeText={(value) => handleInputChange('name', value)}
-            placeholder="Item name"
-            label="Name"
-          />
-          <Input
-            value={formData.price}
-            onChangeText={(value) => handleInputChange('price', value)}
-            placeholder="Price"
-            label="Price (₹)"
-            keyboardType="numeric"
-          />
-          <Input
-            value={formData.category}
-            onChangeText={(value) => handleInputChange('category', value)}
-            placeholder="Category"
-            label="Category"
-          />
-          <View style={styles.checkboxRow}>
-            <Text style={styles.checkboxLabel}>Vegetarian</Text>
-            <Switch
-              value={formData.isVegetarian}
-              onValueChange={(value) => handleInputChange('isVegetarian', value)}
-            />
+        {isLoading ? (
+          <View style={styles.loadingState}>
+            <Spinner size="large" />
           </View>
-          <Input
-            value={formData.portionType}
-            onChangeText={(value) => handleInputChange('portionType', value)}
-            placeholder="Portion type"
-            label="Portion Type"
-          />
-          <Input
-            value={formData.description}
-            onChangeText={(value) => handleInputChange('description', value)}
-            placeholder="Description (optional)"
-            label="Description"
-            multiline
-            numberOfLines={3}
-          />
-          <View style={styles.checkboxRow}>
-            <Text style={styles.checkboxLabel}>Available</Text>
-            <Switch
-              value={formData.isAvailable}
-              onValueChange={(value) => handleInputChange('isAvailable', value)}
-            />
-          </View>
-          <View style={styles.formActions}>
-            <Button
-              onPress={editingItemId ? onUpdateSubmit : onSubmit}
-              disabled={isCreating || isUpdating}
-            >
-              {editingItemId ? 'Update Menu Item' : 'Add Menu Item'}
-            </Button>
-            {editingItemId && (
-              <Button variant="secondary" onPress={resetForm} disabled={isUpdating}>
-                Cancel
-              </Button>
-            )}
-          </View>
-        </View>
-
-        {filteredItems.length === 0 ? (
+        ) : visibleItems.length === 0 ? (
           <View style={styles.emptyState}>
-            <Text style={styles.emptyText}>No menu items found</Text>
+            <Text style={styles.emptyText}>No products found</Text>
           </View>
         ) : (
-          <View style={styles.itemList}>
-            {filteredItems.map((item) => (
-              <MenuItemCard
+          <View style={styles.grid}>
+            {visibleItems.map((item) => (
+              <ProductCard
                 key={item._id}
                 item={item}
-                onDelete={() => handleDelete(item._id)}
-                onEdit={handleEdit}
-                isCreating={isCreating}
-                isUpdating={isUpdating}
+                onPress={() => openEdit(item)}
               />
             ))}
           </View>
         )}
       </ScrollView>
+
+      <BottomSheet visible={sheetOpen} onRequestClose={() => setSheetOpen(false)}>
+        <Text style={styles.sheetTitle}>
+          {editingItemId ? 'Edit Menu Item' : 'Add New Menu Item'}
+        </Text>
+
+        <View style={styles.field}>
+          <Text style={styles.fieldLabel}>Item Name</Text>
+          <TextInput
+            style={styles.fieldInput}
+            placeholder="e.g. Paneer Tikka"
+            placeholderTextColor={colors.textMuted}
+            value={formData.name}
+            onChangeText={(v) => setFormData((p) => ({ ...p, name: v }))}
+          />
+        </View>
+
+        <View style={styles.field}>
+          <Text style={styles.fieldLabel}>Category</Text>
+          <View style={styles.pickerWrap}>
+            <Picker
+              selectedValue={formData.category}
+              onValueChange={(v) => setFormData((p) => ({ ...p, category: v }))}
+              style={styles.picker}
+            >
+              {categories.map((c) => (
+                <Picker.Item key={c} label={c} value={c} />
+              ))}
+            </Picker>
+          </View>
+        </View>
+
+        <View style={styles.field}>
+          <Text style={styles.fieldLabel}>Price (₹)</Text>
+          <TextInput
+            style={styles.fieldInput}
+            placeholder="0.00"
+            placeholderTextColor={colors.textMuted}
+            keyboardType="numeric"
+            value={formData.price}
+            onChangeText={(v) => setFormData((p) => ({ ...p, price: v }))}
+          />
+        </View>
+
+        <View style={styles.field}>
+          <Text style={styles.fieldLabel}>Description</Text>
+          <TextInput
+            style={[styles.fieldInput, styles.fieldTextarea]}
+            placeholder="Short description..."
+            placeholderTextColor={colors.textMuted}
+            multiline
+            numberOfLines={3}
+            value={formData.description}
+            onChangeText={(v) => setFormData((p) => ({ ...p, description: v }))}
+          />
+        </View>
+
+        <View style={styles.toggleRow}>
+          <Text style={styles.toggleLabel}>Available</Text>
+          <Toggle
+            value={formData.isAvailable}
+            onValueChange={(v) => setFormData((p) => ({ ...p, isAvailable: v }))}
+          />
+        </View>
+
+        <View style={styles.sheetActions}>
+          <Button variant="secondary" onPress={() => setSheetOpen(false)} style={styles.sheetActionBtn}>
+            Cancel
+          </Button>
+          <Button
+            onPress={handleSave}
+            loading={isSaving}
+            disabled={isDeleting}
+            style={styles.sheetActionBtn}
+          >
+            {editingItemId ? 'Save Changes' : 'Save Item'}
+          </Button>
+        </View>
+
+        {editingItemId && (
+          <Pressable
+            style={({ pressed }) => [styles.deleteRow, pressed && styles.pressed]}
+            onPress={handleDelete}
+            disabled={isDeleting || isSaving}
+          >
+            <Ionicons name="trash-outline" size={16} color={colors.danger} />
+            <Text style={styles.deleteText}>
+              {isDeleting ? 'Deleting...' : 'Delete Item'}
+            </Text>
+          </Pressable>
+        )}
+      </BottomSheet>
     </Screen>
   );
 }
 
-function MenuItemCard({ item, onDelete, onEdit, isCreating, isUpdating }) {
+function ProductCard({ item, onPress }) {
+  const available = item.isAvailable !== false;
+  const image = item.imageUrl || item.image;
+
   return (
-    <View style={styles.menuItemCard}>
-      <View style={styles.itemHeader}>
-        <Text style={styles.itemName}>{item.name}</Text>
-        <Text style={styles.itemPrice}>₹{item.price}</Text>
-      </View>
-      <View style={styles.itemMeta}>
-        {item.category && <Text style={styles.itemCategory}>{item.category}</Text>}
-        <Badge variant={item.isVegetarian ? 'success' : 'warning'} size="sm">
-          {item.isVegetarian ? 'Veg' : 'Non-Veg'}
+    <Pressable
+      style={({ pressed }) => [styles.productCard, pressed && styles.cardPressed]}
+      onPress={onPress}
+    >
+      <View style={styles.productImg}>
+        {image ? (
+          <Image source={{ uri: image }} style={styles.productImgNative} resizeMode="cover" />
+        ) : (
+          <Text style={styles.productEmoji}>
+            {FALLBACK_EMOJI[item.category] || '🍽️'}
+          </Text>
+        )}
+        <Badge variant={available ? 'success' : 'warning'} size="sm" style={styles.stockBadge}>
+          {available ? 'In stock' : 'Unavailable'}
         </Badge>
       </View>
-      <View style={styles.itemActions}>
-        <TouchableOpacity
-          style={[styles.actionButton, styles.editButton]}
-          onPress={() => onEdit(item)}
-          disabled={isCreating || isUpdating}
-        >
-          <Text style={styles.actionButtonText}>Edit</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.actionButton, styles.deleteButton]}
-          onPress={() => onDelete(item._id)}
-          disabled={isCreating || isUpdating}
-        >
-          <Text style={styles.actionButtonText}>Delete</Text>
-        </TouchableOpacity>
+      <View style={styles.productBody}>
+        <Text style={styles.productName} numberOfLines={1}>
+          {item.name}
+        </Text>
+        <Text style={styles.productCategory}>{item.category || '—'}</Text>
+        <Text style={styles.productPrice}>{formatCurrency(item.price)}</Text>
       </View>
-    </View>
+    </Pressable>
   );
 }
 
@@ -318,121 +353,190 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
   },
   content: {
-    padding: spacing.lg,
-    paddingBottom: spacing.xl * 2,
+    paddingHorizontal: spacing.lg,
+    paddingBottom: spacing.xxl,
   },
-  section: {
-    marginBottom: spacing.xl,
-  },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: colors.textPrimary,
-    marginBottom: spacing.md,
-  },
-  filterRow: {
+  addBtn: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: spacing.sm,
+    alignItems: 'center',
+    gap: 4,
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+    borderRadius: radius.md,
+    backgroundColor: colors.accent,
   },
-  filterButton: {
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
+  addBtnText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: colors.white,
+  },
+  searchBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    backgroundColor: colors.surface,
     borderWidth: 1,
     borderColor: colors.border,
-    borderRadius: radius.pill,
-    backgroundColor: colors.surface,
+    borderRadius: radius.sm,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    marginBottom: 14,
+    ...shadows.soft,
   },
-  filterButtonActive: {
-    backgroundColor: colors.primary,
-    borderColor: colors.primary,
-  },
-  filterButtonText: {
-    fontSize: 13,
-    fontWeight: '500',
-    color: colors.textSecondary,
-  },
-  filterButtonTextActive: {
-    color: colors.primaryForeground,
-  },
-  checkboxRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: spacing.md,
-  },
-  checkboxLabel: {
+  searchInput: {
+    flex: 1,
     fontSize: 14,
     color: colors.textPrimary,
+    fontFamily: 'Inter_400Regular',
+    padding: 0,
   },
-  formActions: {
-    flexDirection: 'row',
-    gap: spacing.md,
-    marginTop: spacing.md,
-  },
-  itemList: {
-    gap: spacing.md,
+  loadingState: {
+    alignItems: 'center',
+    padding: spacing.xl,
   },
   emptyState: {
-    padding: spacing.xl,
     alignItems: 'center',
+    padding: spacing.xl * 2,
   },
   emptyText: {
     color: colors.textMuted,
   },
-  menuItemCard: {
-    padding: spacing.md,
+  grid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: spacing.md,
+    marginBottom: spacing.xl,
+  },
+  productCard: {
+    flexBasis: '47%',
+    flexGrow: 1,
+    backgroundColor: colors.surface,
+    borderRadius: radius.md,
     borderWidth: 1,
     borderColor: colors.border,
-    borderRadius: radius.md,
-    backgroundColor: colors.surface,
+    overflow: 'hidden',
+    ...shadows.soft,
   },
-  itemHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+  cardPressed: {
+    opacity: 0.85,
+  },
+  productImg: {
+    height: 100,
+    backgroundColor: colors.input,
     alignItems: 'center',
-    marginBottom: spacing.xs,
+    justifyContent: 'center',
+    position: 'relative',
   },
-  itemName: {
-    fontSize: 15,
+  productImgNative: {
+    width: '100%',
+    height: '100%',
+    objectFit: 'cover',
+  },
+  productEmoji: {
+    fontSize: 34,
+  },
+  stockBadge: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+  },
+  productBody: {
+    paddingHorizontal: 12,
+    paddingTop: 10,
+    paddingBottom: 12,
+  },
+  productName: {
+    fontSize: 13,
     fontWeight: '600',
     color: colors.textPrimary,
   },
-  itemPrice: {
+  productCategory: {
+    fontSize: 10,
+    color: colors.textMuted,
+    marginTop: 1,
+  },
+  productPrice: {
     fontSize: 15,
     fontWeight: '700',
     color: colors.primary,
+    marginTop: 4,
   },
-  itemMeta: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.md,
+  sheetTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: colors.textPrimary,
+    marginBottom: spacing.lg,
+  },
+  field: {
+    gap: 6,
     marginBottom: spacing.md,
   },
-  itemCategory: {
+  fieldLabel: {
     fontSize: 12,
-    color: colors.textMuted,
+    fontWeight: '600',
+    color: colors.textSecondary,
   },
-  itemActions: {
-    flexDirection: 'row',
-    gap: spacing.sm,
-  },
-  actionButton: {
-    flex: 1,
-    paddingVertical: spacing.sm,
-    borderWidth: 1,
+  fieldInput: {
+    paddingHorizontal: 14,
+    paddingVertical: 12,
     borderRadius: radius.sm,
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: colors.input,
+    color: colors.textPrimary,
+    fontSize: 14,
+    fontFamily: 'Inter_400Regular',
+  },
+  fieldTextarea: {
+    minHeight: 76,
+    textAlignVertical: 'top',
+  },
+  pickerWrap: {
+    borderRadius: radius.sm,
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: colors.input,
+    overflow: 'hidden',
+  },
+  picker: {
+    height: 48,
+  },
+  toggleRow: {
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 4,
+    marginBottom: spacing.md,
   },
-  editButton: {
-    borderColor: colors.primary,
-  },
-  deleteButton: {
-    borderColor: colors.danger,
-  },
-  actionButtonText: {
-    fontSize: 12,
+  toggleLabel: {
+    fontSize: 13,
     fontWeight: '500',
+    color: colors.textPrimary,
+  },
+  sheetActions: {
+    flexDirection: 'row',
+    gap: 10,
+    marginTop: 4,
+  },
+  sheetActionBtn: {
+    flex: 1,
+  },
+  deleteRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    marginTop: spacing.lg,
+    paddingVertical: 12,
+    borderTopWidth: 1,
+    borderTopColor: colors.border,
+  },
+  pressed: {
+    opacity: 0.8,
+  },
+  deleteText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: colors.danger,
   },
 });
-

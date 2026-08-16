@@ -7,7 +7,8 @@ import AppHeader from "../components/AppHeader";
 import { Button, Badge } from "../components";
 import Spinner from "../components/Spinner";
 import OrderStatusHistory from "../components/OrderStatusHistory";
-import { colors, spacing, radius, typography } from "../theme";
+import { colors, spacing, radius, shadows } from "../theme";
+import { formatCurrency, orderStatusInfo } from "../utils/format";
 
 export default function OrderDetailScreen({ route, navigation }) {
   const { user } = useAuth();
@@ -38,10 +39,10 @@ export default function OrderDetailScreen({ route, navigation }) {
   };
 
   const handleStatusChange = async (action) => {
-    if (!order || !updatingStatus) return;
+    if (!order || updatingStatus) return;
     setUpdatingStatus(true);
     try {
-      await orderApi.updateStatus(order._id, action);
+      await orderApi.updateStatus(order.orderId || order._id, action);
       fetchOrder();
     } catch (e) {
       console.error("Failed to update order status:", e);
@@ -66,7 +67,7 @@ export default function OrderDetailScreen({ route, navigation }) {
   if (loading && !order) {
     return (
       <Screen>
-        <AppHeader title="Order Detail" />
+        <AppHeader onBack={() => navigation.goBack()} />
         <View style={styles.loadingContainer}>
           <Spinner size="large" />
         </View>
@@ -77,7 +78,7 @@ export default function OrderDetailScreen({ route, navigation }) {
   if (error && !order) {
     return (
       <Screen>
-        <AppHeader title="Order Detail" />
+        <AppHeader onBack={() => navigation.goBack()} />
         <View style={styles.errorContainer}>
           <Text style={styles.errorText}>{error}</Text>
           <Button onPress={() => fetchOrder()}>Retry</Button>
@@ -89,7 +90,7 @@ export default function OrderDetailScreen({ route, navigation }) {
   if (!order) {
     return (
       <Screen>
-        <AppHeader title="Order Detail" />
+        <AppHeader onBack={() => navigation.goBack()} />
         <View style={styles.emptyContainer}>
           <Text style={styles.emptyText}>Order not found</Text>
           <Button onPress={() => navigation.goBack()}>Back to Orders</Button>
@@ -98,56 +99,41 @@ export default function OrderDetailScreen({ route, navigation }) {
     );
   }
 
-  const statusIndex = [
-    "placed",
-    "accepted",
-    "preparing",
-    "ready",
-    "served",
-    "completed",
-    "cancelled",
-  ].indexOf(order.status);
-  const canAccept = statusIndex >= 0 && statusIndex < 4;
-  const canComplete = statusIndex >= 1 && statusIndex < 5;
-  const canCancel = statusIndex >= 0 && statusIndex < 6;
+  const statusInfo = orderStatusInfo(order);
+  const canAccept = ["pending_payment", "accepted", "paid"].includes(order.orderStatus);
+  const canComplete = ["accepted", "paid"].includes(order.orderStatus);
+  const canCancel = !["completed", "cancelled"].includes(order.orderStatus);
+  const itemCount = order.items?.length || order.itemCount || 0;
+  const productsLine = (order.items || [])
+    .map((i) => i.nameSnapshot || i.name)
+    .filter(Boolean)
+    .join(", ");
 
   return (
     <Screen>
-      <AppHeader
-        title={`Order #${order.orderNumber || order._id?.slice(-6)}`}
-      />
-      <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.content}
-      >
-        <View style={styles.headerCard}>
-          <View style={styles.headerInfo}>
-            <View style={styles.orderMeta}>
-              <Text style={styles.metaText}>
-                Order Number: #{order.orderNumber || order._id?.slice(-6)}
-              </Text>
-              <Text style={styles.metaText}>
-                Placed: {new Date(order.placedAt).toLocaleString()}
-              </Text>
-            </View>
-            <View style={styles.orderCustomer}>
-              <Text style={styles.metaText}>
-                Customer: {order.customerName || "—"}
-              </Text>
-              <Text style={styles.metaText}>Phone: {order.phone || "—"}</Text>
-            </View>
-            {order.specialInstructions && (
-              <Text style={styles.specialInstructions}>
-                <Text style={styles.specialLabel}>Special Instructions:</Text>{" "}
-                {order.specialInstructions}
-              </Text>
-            )}
-          </View>
-          <View style={styles.headerBadge}>
-            <Badge variant="primary" size="lg">
-              {order.status}
-            </Badge>
-          </View>
+      <AppHeader onBack={() => navigation.goBack()} />
+      <ScrollView style={styles.scrollView} contentContainerStyle={styles.content}>
+        <View style={styles.detailCard}>
+          <DetailRow label="Order ID" value={`#${order.orderNumber || order._id?.slice(-6)}`} />
+          <DetailRow
+            label="Status"
+            value={<Badge variant={statusInfo.variant} size="sm">{statusInfo.label}</Badge>}
+          />
+          <DetailRow label="Items" value={`${itemCount} items`} />
+          <DetailRow label="Amount" value={formatCurrency(order.total)} valueStyle={styles.amountValue} />
+          {productsLine ? (
+            <DetailRow label="Products" value={productsLine} valueStyle={styles.productsValue} />
+          ) : null}
+          <DetailRow
+            label="Time"
+            value={order.placedAt ? new Date(order.placedAt).toLocaleString() : "—"}
+          />
+          {order.customerName || order.phone ? (
+            <DetailRow
+              label="Customer"
+              value={[order.customerName, order.phone].filter(Boolean).join(" · ")}
+            />
+          ) : null}
         </View>
 
         <OrderStatusHistory order={order} onStatusChange={handleStatusChange} />
@@ -158,10 +144,10 @@ export default function OrderDetailScreen({ route, navigation }) {
             <View style={styles.itemsList}>
               {order.items.map((item, idx) => (
                 <View key={idx} style={styles.itemRow}>
-                  <Text style={styles.itemName}>{item.name}</Text>
+                  <Text style={styles.itemName}>{item.nameSnapshot || item.name}</Text>
                   <Text style={styles.itemQty}>×{item.quantity}</Text>
                   <Text style={styles.itemPrice}>
-                    ₹{item.price * item.quantity}
+                    {formatCurrency((item.priceSnapshot ?? item.price) * item.quantity)}
                   </Text>
                 </View>
               ))}
@@ -174,33 +160,25 @@ export default function OrderDetailScreen({ route, navigation }) {
         <View style={styles.sectionCard}>
           <View style={styles.totalsRow}>
             <Text style={styles.totalsLabel}>Subtotal</Text>
-            <Text style={styles.totalsValue}>
-              ₹{order.subtotal || order.totalAmount}
-            </Text>
+            <Text style={styles.totalsValue}>{formatCurrency(order.subtotal)}</Text>
           </View>
           {order.tax && order.tax > 0 && (
             <View style={styles.totalsRow}>
               <Text style={styles.totalsLabel}>Tax</Text>
-              <Text style={styles.totalsValue}>₹{order.tax}</Text>
-            </View>
-          )}
-          {order.serviceCharge && order.serviceCharge > 0 && (
-            <View style={styles.totalsRow}>
-              <Text style={styles.totalsLabel}>Service Charge</Text>
-              <Text style={styles.totalsValue}>₹{order.serviceCharge}</Text>
+              <Text style={styles.totalsValue}>{formatCurrency(order.tax)}</Text>
             </View>
           )}
           <View style={[styles.totalsRow, styles.totalsTotal]}>
             <Text style={styles.totalsLabel}>Total</Text>
-            <Text style={styles.totalsValue}>₹{order.totalAmount}</Text>
+            <Text style={styles.totalsValue}>{formatCurrency(order.total)}</Text>
           </View>
         </View>
 
-        <View style={styles.metaGrid}>
+        <View style={styles.metaCard}>
           <View style={styles.metaItem}>
             <Text style={styles.metaLabel}>Table</Text>
             <Text style={styles.metaValue}>
-              {order.table?.tableNumber || "—"}
+              {order.tableNumber || order.tableId || "—"}
             </Text>
           </View>
           <View style={styles.metaItem}>
@@ -218,14 +196,6 @@ export default function OrderDetailScreen({ route, navigation }) {
               {order.paymentStatus}
             </Badge>
           </View>
-          {order.serverDate && (
-            <View style={styles.metaItem}>
-              <Text style={styles.metaLabel}>Served At</Text>
-              <Text style={styles.metaValue}>
-                {new Date(order.serverDate).toLocaleString()}
-              </Text>
-            </View>
-          )}
         </View>
 
         {(canAccept || canComplete || canCancel) && (
@@ -235,34 +205,36 @@ export default function OrderDetailScreen({ route, navigation }) {
                 variant="outline"
                 onPress={() => handleStatusChange("accept")}
                 disabled={updatingStatus}
+                style={styles.actionBtn}
               >
                 Accept
               </Button>
             )}
-            {canComplete && order.status === "accepted" && (
+            {canComplete && (
               <Button
                 onPress={() => handleStatusChange("complete")}
                 disabled={updatingStatus}
+                style={styles.actionBtn}
               >
                 Complete
               </Button>
             )}
-            {canCancel &&
-              order.status !== "completed" &&
-              order.status !== "cancelled" && (
-                <Button
-                  variant="danger"
-                  onPress={() => handleStatusChange("cancel")}
-                  disabled={updatingStatus}
-                >
-                  Cancel
-                </Button>
-              )}
-            {order.paymentMethod === "cash" && order.status !== "completed" && (
+            {canCancel && (
+              <Button
+                variant="danger"
+                onPress={() => handleStatusChange("cancel")}
+                disabled={updatingStatus}
+                style={styles.actionBtn}
+              >
+                Cancel
+              </Button>
+            )}
+            {order.paymentMethod === "cash" && order.paymentStatus !== "paid" && (
               <Button
                 variant="secondary"
-                onPress={() => handleMarkCashPaid(order._id)}
+                onPress={() => handleMarkCashPaid(order.orderId || order._id)}
                 disabled={updatingStatus}
+                style={styles.actionBtn}
               >
                 Mark as Paid
               </Button>
@@ -274,14 +246,31 @@ export default function OrderDetailScreen({ route, navigation }) {
   );
 }
 
+function DetailRow({ label, value, valueStyle }) {
+  return (
+    <View style={styles.detailRow}>
+      <Text style={styles.detailLabel}>{label}</Text>
+      <View style={styles.detailValueWrap}>
+        {typeof value === "string" ? (
+          <Text style={[styles.detailValue, valueStyle]} numberOfLines={2}>
+            {value}
+          </Text>
+        ) : (
+          value
+        )}
+      </View>
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
   scrollView: {
     flex: 1,
     backgroundColor: colors.background,
   },
   content: {
-    padding: spacing.lg,
-    paddingBottom: spacing.xl * 2,
+    paddingHorizontal: spacing.lg,
+    paddingBottom: spacing.xxl,
   },
   loadingContainer: {
     flex: 1,
@@ -308,41 +297,47 @@ const styles = StyleSheet.create({
     color: colors.textMuted,
     marginBottom: spacing.md,
   },
-  headerCard: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    padding: spacing.md,
+  detailCard: {
     backgroundColor: colors.surface,
     borderRadius: radius.md,
     borderWidth: 1,
     borderColor: colors.border,
+    paddingVertical: 6,
+    paddingHorizontal: spacing.lg,
     marginBottom: spacing.md,
+    ...shadows.soft,
   },
-  headerInfo: {
+  detailRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+    paddingVertical: 9,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: colors.border,
+  },
+  detailLabel: {
+    fontSize: 13,
+    color: colors.textMuted,
+    paddingTop: 2,
+  },
+  detailValueWrap: {
     flex: 1,
+    alignItems: "flex-end",
+    paddingLeft: spacing.md,
   },
-  orderMeta: {
-    gap: spacing.xs,
-    marginBottom: spacing.sm,
-  },
-  orderCustomer: {
-    gap: spacing.xs,
-    marginBottom: spacing.sm,
-  },
-  metaText: {
-    fontSize: 13,
-    color: colors.textSecondary,
-  },
-  specialInstructions: {
-    fontSize: 13,
-    color: colors.textPrimary,
-  },
-  specialLabel: {
+  detailValue: {
+    fontSize: 14,
     fontWeight: "600",
+    color: colors.textPrimary,
+    textAlign: "right",
   },
-  headerBadge: {
-    alignSelf: "flex-start",
+  amountValue: {
+    color: colors.primary,
+    fontWeight: "700",
+  },
+  productsValue: {
+    fontWeight: "500",
+    maxWidth: "60%",
   },
   sectionCard: {
     padding: spacing.md,
@@ -366,7 +361,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     paddingVertical: spacing.sm,
-    borderBottomWidth: 1,
+    borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: colors.border,
   },
   itemName: {
@@ -390,7 +385,7 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.xs,
   },
   totalsTotal: {
-    borderTopWidth: 1,
+    borderTopWidth: StyleSheet.hairlineWidth,
     borderTopColor: colors.border,
     marginTop: spacing.xs,
     paddingTop: spacing.sm,
@@ -404,10 +399,15 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: colors.textPrimary,
   },
-  metaGrid: {
+  metaCard: {
     flexDirection: "row",
     flexWrap: "wrap",
     gap: spacing.md,
+    padding: spacing.md,
+    backgroundColor: colors.surface,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    borderColor: colors.border,
     marginBottom: spacing.md,
   },
   metaItem: {
@@ -428,5 +428,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     gap: spacing.sm,
+    marginBottom: spacing.lg,
+  },
+  actionBtn: {
+    flexGrow: 1,
   },
 });

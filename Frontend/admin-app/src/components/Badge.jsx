@@ -1,6 +1,6 @@
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
-import { colors, radius, typography } from "../theme";
+import { colors } from "../theme";
 
 const VARIANTS = {
   info: {
@@ -69,12 +69,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 5,
-    paddingHorizontal: 9,
-    paddingVertical: 4,
-    borderRadius: radius.pill,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 20,
   },
   badgeSm: {
-    paddingHorizontal: 7,
+    paddingHorizontal: 6,
     paddingVertical: 2,
   },
   dot: {
@@ -83,10 +83,12 @@ const styles = StyleSheet.create({
     borderRadius: 3,
   },
   label: {
-    ...typography.labelSm,
+    fontSize: 10,
+    lineHeight: 13,
     fontWeight: "600",
   },
   labelSm: {
-    fontSize: 10,
+    fontSize: 9,
+    lineHeight: 12,
   },
 });
