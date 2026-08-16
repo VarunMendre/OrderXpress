@@ -3,20 +3,17 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import { colors, radius, shadows, spacing } from '../theme';
 
 export default function Card({ onPress, style, children, interactive = false }) {
-  const Wrapper = interactive ? Pressable : View;
-  const wrapperProps = interactive ? { onPress } : {};
-  return (
-    <Wrapper
-      {...wrapperProps}
-      style={({ pressed }) => [
-        styles.card,
-        interactive && pressed && styles.pressed,
-        style,
-      ]}
-    >
-      {children}
-    </Wrapper>
-  );
+  if (interactive) {
+    return (
+      <Pressable
+        onPress={onPress}
+        style={({ pressed }) => [styles.card, pressed && styles.pressed, style]}
+      >
+        {children}
+      </Pressable>
+    );
+  }
+  return <View style={[styles.card, style]}>{children}</View>;
 }
 
 const styles = StyleSheet.create({

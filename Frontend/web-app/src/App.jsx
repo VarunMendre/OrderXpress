@@ -1,14 +1,36 @@
+import React from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { CustomerSessionProvider } from './context/CustomerSessionContext';
+import { CartProvider } from './context/CartContext';
+import ScanSessionScreen from './screens/ScanSessionScreen';
+import MenuScreen from './screens/MenuScreen';
+import CartScreen from './screens/CartScreen';
+import CheckoutScreen from './screens/CheckoutScreen';
+import TrackingScreen from './screens/TrackingScreen';
 import './styles/global.css';
 import './styles/welcome.css';
 import AppHeader from './components/AppHeader';
 
-const WELCOME_STEPS = [
-  { key: 'scan', icon: '📱', title: 'Scan the QR', text: 'Scan the QR code on your table to open the menu.' },
-  { key: 'order', icon: '🍽️', title: 'Browse & order', text: 'Pick your favourite dishes and add them to cart.' },
-  { key: 'pay', icon: '💳', title: 'Pay & track', text: 'Pay online or at counter and track your order live.' },
-];
+function AppRoutes() {
+  return (
+    <Routes>
+      <Route path="/scan" element={<ScanSessionScreen />} />
+      <Route path="/menu" element={<MenuScreen />} />
+      <Route path="/cart" element={<CartScreen />} />
+      <Route path="/checkout" element={<CheckoutScreen />} />
+      <Route path="/tracking/:orderId" element={<TrackingScreen />} />
+      <Route path="/" element={<WelcomeScreen />} />
+    </Routes>
+  );
+}
 
-export default function App() {
+function WelcomeScreen() {
+  const WELCOME_STEPS = [
+    { key: 'scan', icon: '📱', title: 'Scan the QR', text: 'Scan the QR code on your table to open the menu.' },
+    { key: 'order', icon: '🍽️', title: 'Browse & order', text: 'Pick your favourite dishes and add them to cart.' },
+    { key: 'pay', icon: '💳', title: 'Pay & track', text: 'Pay online or at counter and track your order live.' },
+  ];
+
   return (
     <div className="app-shell">
       <AppHeader />
@@ -31,5 +53,17 @@ export default function App() {
         </div>
       </main>
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <CustomerSessionProvider>
+        <CartProvider>
+          <AppRoutes />
+        </CartProvider>
+      </CustomerSessionProvider>
+    </BrowserRouter>
   );
 }

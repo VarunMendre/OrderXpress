@@ -1,52 +1,48 @@
-import { Platform } from 'react-native';
-import Constants from 'expo-constants';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const COOKIE_STORAGE_KEY = 'orderxpress.session.cookie';
-const API_PORT = 4000;
+export const API_BASE_URL = `${process.env.EXPO_PUBLIC_API_BASE_URL}/api/v1`;
 
-let sessionCookie = null;
+const TOKEN_STORAGE_KEY = 'auth_token';
+
+let authToken = null;
 let unauthorizedHandler = null;
 
-export function getSessionCookie() {
-  return sessionCookie;
-}
-
-export function setUnauthorizedHandler(fn) {
-  unauthorizedHandler = fn;
-}
-
+// Call this once on app boot (e.g. in AuthContext) to restore any saved
+// token before the first request goes out.
 export async function restoreSessionCookie() {
-  sessionCookie = await AsyncStorage.getItem(COOKIE_STORAGE_KEY);
-  return sessionCookie;
-}
-
-export async function clearSessionCookie() {
-  sessionCookie = null;
-  await AsyncStorage.removeItem(COOKIE_STORAGE_KEY);
-}
-
-function resolveHost() {
-  const hostUri = Constants.expoConfig?.hostUri || Constants.expoGoConfig?.debuggerHost;
-  if (hostUri) return hostUri.split(':')[0];
-  return 'localhost';
-}
-
-export const API_BASE_URL = `http://${resolveHost()}:${API_PORT}/api/v1`;
-
-async function captureSessionCookie(res) {
   try {
-    const setCookie = res.headers.get('set-cookie');
-    if (!setCookie) return;
-    const match = setCookie.match(/session=([^;]+)/);
-    if (match) {
-      sessionCookie = match[1];
-      await AsyncStorage.setItem(COOKIE_STORAGE_KEY, sessionCookie);
-    }
+    const stored = await AsyncStorage.getItem(TOKEN_STORAGE_KEY);
+    if (stored) authToken = stored;
   } catch {
-    // Some platforms do not expose set-cookie; the JS-side cookie jar is only a
-    // fallback — the native session (iOS) still works there.
+    // ignore — will just start unauthenticated
   }
+}
+
+// Call this right after a successful login/register response, passing
+// data.tokens.bearer from the response body.
+export async function setAuthToken(token) {
+  authToken = token;
+  try {
+    await AsyncStorage.setItem(TOKEN_STORAGE_KEY, token);
+  } catch {
+    // ignore — token still works for this session, just won't persist
+  }
+}
+
+// Call this on logout.
+export async function clearSessionCookie() {
+  authToken = null;
+  try {
+    await AsyncStorage.removeItem(TOKEN_STORAGE_KEY);
+  } catch {
+    // ignore
+  }
+}
+
+// Lets other modules (e.g. AuthContext) register a callback that runs
+// whenever a request comes back 401, so the app can redirect to Login.
+export function setUnauthorizedHandler(handler) {
+  unauthorizedHandler = handler;
 }
 
 export class ApiError extends Error {
@@ -68,7 +64,7 @@ export async function api(path, { method = 'GET', body, params } = {}) {
   }
 
   const headers = { Accept: 'application/json' };
-  if (sessionCookie) headers.Cookie = `session=${sessionCookie}`;
+  if (authToken) headers.Authorization = `Bearer ${authToken}`;
   if (body) headers['Content-Type'] = 'application/json';
 
   let res;
@@ -76,14 +72,11 @@ export async function api(path, { method = 'GET', body, params } = {}) {
     res = await fetch(url, {
       method,
       headers,
-      credentials: 'omit',
       body: body ? JSON.stringify(body) : undefined,
     });
   } catch {
     throw new ApiError('Cannot reach the server. Check your connection.', 'NETWORK_ERROR', 0);
   }
-
-  await captureSessionCookie(res);
 
   let json = null;
   try {

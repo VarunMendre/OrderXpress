@@ -1,11 +1,12 @@
-import React from 'react';
-import { ActivityIndicator, Pressable, StyleSheet, Text } from 'react-native';
-import { colors, radius, spacing, typography } from '../theme';
+import React from "react";
+import { ActivityIndicator, Pressable, StyleSheet, Text } from "react-native";
+import { colors, radius, spacing, typography } from "../theme";
 
 export default function Button({
   title,
+  children,
   onPress,
-  variant = 'primary',
+  variant = "primary",
   loading = false,
   disabled = false,
   style,
@@ -14,8 +15,9 @@ export default function Button({
   iconName,
   iconSize = 18,
 }) {
-  const isPrimary = variant === 'primary';
+  const isPrimary = variant === "primary";
   const isDisabled = disabled || loading;
+  const label = title ?? children;
 
   return (
     <Pressable
@@ -24,7 +26,8 @@ export default function Button({
       style={({ pressed }) => [
         styles.base,
         isPrimary ? styles.primary : styles.secondary,
-        (pressed || isDisabled) && (isPrimary ? styles.pressedPrimary : styles.pressedSecondary),
+        (pressed || isDisabled) &&
+          (isPrimary ? styles.pressedPrimary : styles.pressedSecondary),
         style,
       ]}
     >
@@ -35,9 +38,21 @@ export default function Button({
         />
       ) : (
         <>
-          {Icon && <Icon name={iconProps} size={iconSize} color={isPrimary ? colors.white : colors.accent} />}
-          <Text style={[styles.text, isPrimary ? styles.textPrimaryBtn : styles.textSecondary, textStyle]}>
-            {title}
+          {Icon && (
+            <Icon
+              name={iconName}
+              size={iconSize}
+              color={isPrimary ? colors.white : colors.accent}
+            />
+          )}
+          <Text
+            style={[
+              styles.text,
+              isPrimary ? styles.textPrimaryBtn : styles.textSecondary,
+              textStyle,
+            ]}
+          >
+            {label}
           </Text>
         </>
       )}
@@ -50,9 +65,9 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     paddingHorizontal: 16,
     borderRadius: radius.sm,
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexDirection: 'row',
+    alignItems: "center",
+    justifyContent: "center",
+    flexDirection: "row",
     gap: 6,
   },
   primary: {
@@ -66,7 +81,7 @@ const styles = StyleSheet.create({
   pressedPrimary: { opacity: 0.85 },
   pressedSecondary: { backgroundColor: colors.surfaceHover },
   text: {
-    fontFamily: 'Inter_600SemiBold',
+    fontFamily: "Inter_600SemiBold",
     fontSize: 14,
   },
   textPrimaryBtn: { color: colors.white },
