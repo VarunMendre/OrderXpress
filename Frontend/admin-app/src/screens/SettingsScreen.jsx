@@ -1,105 +1,211 @@
-import React from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, Pressable, ScrollView, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useAuth } from '../context/AuthContext';
 import Screen from '../components/Screen';
 import AppHeader from '../components/AppHeader';
-import { colors, radius, shadows, spacing, typography } from '../theme';
-import { useAuth } from '../context/AuthContext';
+import Toggle from '../components/Toggle';
+import { colors, spacing, radius, typography } from '../theme';
+import { getInitials } from '../utils/format';
 
-export default function SettingsScreen() {
+const THEME_KEY = 'ox-admin-theme';
+
+export default function SettingsScreen({ navigation }) {
   const { user, logout } = useAuth();
-  const admin = user?.admin;
-  const restaurant = user?.restaurant;
+  const [darkMode, setDarkMode] = useState(false);
+  const [pushEnabled, setPushEnabled] = useState(true);
+  const [emailReports, setEmailReports] = useState(false);
 
-  const initials = admin?.ownerName
-    ? admin.ownerName
-        .split(' ')
-        .map((p) => p[0])
-        .slice(0, 2)
-        .join('')
-        .toUpperCase()
-    : 'A';
+  useEffect(() => {
+    AsyncStorage.getItem(THEME_KEY)
+      .then((v) => setDarkMode(v === 'dark'))
+      .catch(() => {});
+  }, []);
+
+  const ownerName = user?.admin?.ownerName || 'Restaurant Owner';
+  const restaurantName = user?.restaurant?.name || user?.onboarding?.restaurantName || 'Your Restaurant';
+
+  const toggleDarkMode = (value) => {
+    setDarkMode(value);
+    AsyncStorage.setItem(THEME_KEY, value ? 'dark' : 'light').catch(() => {});
+    Alert.alert('Dark Mode', 'Dark mode will be available in a future update.');
+  };
+
+  const handleLogout = () => {
+    Alert.alert('Log Out', 'Are you sure you want to log out?', [
+      { text: 'Cancel', style: 'cancel' },
+      { text: 'Log Out', style: 'destructive', onPress: logout },
+    ]);
+  };
+
+  if (!user) {
+    return null;
+  }
 
   return (
     <Screen>
-      <AppHeader />
-      <Text style={styles.pageTitle}>Settings</Text>
-
-      <View style={styles.profileCard}>
-        <View style={styles.profileAvatar}>
-          <Text style={styles.profileInitials}>{initials}</Text>
-        </View>
-        <View style={styles.profileInfo}>
-          <Text style={styles.profileName}>{admin?.ownerName || 'Restaurant Admin'}</Text>
-          <Text style={styles.profileMeta}>
-            {restaurant?.name || 'Restaurant'}
-            {restaurant?.cuisineType ? ` · ${restaurant.cuisineType}` : ''}
-          </Text>
-          <Text style={styles.profileMeta}>{admin?.email}</Text>
-        </View>
-      </View>
-
-      <View style={styles.group}>
-        <Text style={styles.groupTitle}>Account</Text>
-        <Pressable style={({ pressed }) => [styles.item, pressed && styles.itemPressed]}>
-          <View style={[styles.itemIcon, styles.iconWallet]}>
-            <Ionicons name="storefront-outline" size={18} color={colors.primary} />
-          </View>
-          <View style={styles.itemContent}>
-            <Text style={styles.itemTitle}>Restaurant Profile</Text>
-            <Text style={styles.itemSub}>Coming in Chunk 11</Text>
-          </View>
-        </Pressable>
-        <Pressable style={({ pressed }) => [styles.item, pressed && styles.itemPressed]}>
-          <View style={[styles.itemIcon, styles.iconNavy]}>
-            <Ionicons name="qr-code-outline" size={18} color={colors.navy} />
-          </View>
-          <View style={styles.itemContent}>
-            <Text style={styles.itemTitle}>Tables & QR</Text>
-            <Text style={styles.itemSub}>{restaurant?.tableCount ?? '-'} tables configured</Text>
-          </View>
-        </Pressable>
-      </View>
-
-      <View style={styles.group}>
-        <Text style={styles.groupTitle}>Session</Text>
+      <AppHeader onNotifications={() => {}} />
+      <ScrollView style={styles.scrollView} contentContainerStyle={styles.content}>
         <Pressable
-          style={({ pressed }) => [styles.item, pressed && styles.itemPressed]}
-          onPress={logout}
+          style={({ pressed }) => [styles.profileCard, pressed && styles.pressed]}
+          onPress={() => Alert.alert(ownerName, `${restaurantName}\nAdministrator`)}
         >
-          <View style={[styles.iconBase, styles.iconDanger]}>
-            <Ionicons name="log-out-outline" size={18} color={colors.danger} />
+          <View style={styles.avatar}>
+            <Text style={styles.avatarText}>{getInitials(ownerName)}</Text>
           </View>
-          <View style={styles.itemContent}>
-            <Text style={styles.itemTitle}>Log out</Text>
-            <Text style={styles.itemSub}>End this session on this device</Text>
+          <View style={styles.profileInfo}>
+            <Text style={styles.profileName}>{ownerName}</Text>
+            <View style={styles.profileSubRow}>
+              <Text style={styles.profileSub}>Administrator</Text>
+              <View style={styles.statusDot} />
+            </View>
           </View>
           <Ionicons name="chevron-forward" size={16} color={colors.textMuted} />
         </Pressable>
-      </View>
+
+        <View style={styles.group}>
+          <Text style={styles.groupTitle}>Preferences</Text>
+          <SettingsItem
+            icon="time-outline"
+            variant="purple"
+            title="Dark Mode"
+            subtitle={darkMode ? 'On' : 'Off'}
+            right={<Toggle value={darkMode} onValueChange={toggleDarkMode} />}
+          />
+          <SettingsItem
+            icon="notifications-outline"
+            variant="teal"
+            title="Push Notifications"
+            subtitle="New orders, updates"
+            right={<Toggle value={pushEnabled} onValueChange={setPushEnabled} />}
+          />
+          <SettingsItem
+            icon="mail-outline"
+            variant="amber"
+            title="Email Reports"
+            subtitle="Daily summary"
+            right={<Toggle value={emailReports} onValueChange={setEmailReports} />}
+          />
+        </View>
+
+        <View style={styles.group}>
+          <Text style={styles.groupTitle}>Store</Text>
+          <SettingsItem
+            icon="people-outline"
+            variant="purple"
+            title="Staff Management"
+            subtitle={`${restaurantName}`}
+            onPress={() => Alert.alert('Staff Management', 'Manage your team and roles.')}
+          />
+          <SettingsItem
+            icon="card-outline"
+            variant="teal"
+            title="Payment Methods"
+            subtitle="Razorpay, Cash at Counter"
+            onPress={() => Alert.alert('Payment Methods', 'Online payments are configured in the backend.')}
+          />
+          <SettingsItem
+            icon="restaurant-outline"
+            variant="amber"
+            title="Qr Codes"
+            subtitle="Table QR codes"
+            onPress={() => navigation.navigate('Menu', { screen: 'Qr' })}
+          />
+        </View>
+
+        <View style={styles.group}>
+          <Text style={styles.groupTitle}>Support</Text>
+          <SettingsItem
+            icon="help-circle-outline"
+            variant="red"
+            title="Help & Support"
+            subtitle="FAQ, contact, docs"
+            onPress={() => Alert.alert('Help & Support', 'Contact support for assistance with OrderXpress.')}
+          />
+          <SettingsItem
+            icon="information-circle-outline"
+            variant="purple"
+            title="About"
+            subtitle="Version 2.4.1"
+            onPress={() => Alert.alert('About', 'OrderXpress Admin\nRestaurant order management made simple.')}
+          />
+        </View>
+
+        <View style={styles.group}>
+          <Text style={styles.groupTitle}>Account</Text>
+          <SettingsItem
+            icon="log-out-outline"
+            variant="red"
+            title="Log Out"
+            subtitle="Sign out of this device"
+            onPress={handleLogout}
+          />
+        </View>
+      </ScrollView>
     </Screen>
   );
 }
 
+const ICON_VARIANTS = {
+  purple: { bg: colors.accentGlow, color: colors.accentLight },
+  teal: { bg: colors.primaryTint, color: colors.primary },
+  amber: { bg: colors.warningTint, color: colors.warning },
+  red: { bg: colors.dangerTint, color: colors.danger },
+};
+
+function SettingsItem({ icon, variant = 'purple', title, subtitle, onPress, right }) {
+  const v = ICON_VARIANTS[variant] || ICON_VARIANTS.purple;
+  const Wrapper = onPress ? Pressable : View;
+  const wrapperProps = onPress
+    ? { onPress, style: ({ pressed }) => [styles.item, pressed && styles.itemPressed] }
+    : { style: styles.item };
+
+  return (
+    <Wrapper {...wrapperProps}>
+      <View style={[styles.itemIcon, { backgroundColor: v.bg }]}>
+        <Ionicons name={icon} size={18} color={v.color} />
+      </View>
+      <View style={styles.itemContent}>
+        <Text style={styles.itemTitle}>{title}</Text>
+        <Text style={styles.itemSubtitle}>{subtitle}</Text>
+      </View>
+      {right || (
+        <Ionicons name="chevron-forward" size={16} color={colors.textMuted} />
+      )}
+    </Wrapper>
+  );
+}
+
 const styles = StyleSheet.create({
-  pageTitle: {
-    ...typography.headline,
-    marginTop: 4,
-    marginBottom: 16,
+  scrollView: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
+  content: {
+    paddingHorizontal: spacing.lg,
+    paddingBottom: spacing.xxl,
   },
   profileCard: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 14,
+    padding: 16,
     backgroundColor: colors.surface,
     borderRadius: radius.md,
-    padding: 16,
     borderWidth: 1,
     borderColor: colors.border,
-    marginBottom: 20,
-    ...shadows.soft,
+    marginBottom: spacing.xl,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.06,
+    shadowRadius: 3,
+    elevation: 1,
   },
-  profileAvatar: {
+  pressed: {
+    opacity: 0.85,
+  },
+  avatar: {
     width: 52,
     height: 52,
     borderRadius: 26,
@@ -107,74 +213,86 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  profileInitials: {
-    fontFamily: 'Inter_700Bold',
-    fontSize: 20,
+  avatarText: {
     color: colors.white,
+    fontSize: 20,
+    fontWeight: '700',
   },
   profileInfo: {
     flex: 1,
-    gap: 2,
   },
   profileName: {
-    ...typography.title,
+    fontSize: 15,
+    fontWeight: '600',
+    color: colors.textPrimary,
   },
-  profileMeta: {
-    ...typography.bodySm,
+  profileSubRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 1,
+  },
+  profileSub: {
+    fontSize: 12,
     color: colors.textSecondary,
   },
+  statusDot: {
+    width: 7,
+    height: 7,
+    borderRadius: 4,
+    backgroundColor: colors.success,
+    marginLeft: 6,
+    alignSelf: 'center',
+  },
   group: {
-    marginBottom: 20,
+    marginBottom: spacing.xl,
   },
   groupTitle: {
-    ...typography.labelSm,
+    fontSize: 11,
+    fontWeight: '600',
     color: colors.textMuted,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
-    marginBottom: 8,
+    marginBottom: spacing.sm,
     paddingLeft: 4,
   },
   item: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    gap: spacing.md,
+    paddingVertical: 13,
+    paddingHorizontal: 14,
     backgroundColor: colors.surface,
-    borderRadius: radius.sm,
     borderWidth: 1,
     borderColor: colors.border,
-    paddingHorizontal: 14,
-    paddingVertical: 13,
+    borderRadius: radius.sm,
     marginBottom: 6,
-    ...shadows.soft,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.06,
+    shadowRadius: 3,
+    elevation: 1,
   },
   itemPressed: {
     backgroundColor: colors.surfaceHover,
   },
-  iconBase: {
+  itemIcon: {
     width: 34,
     height: 34,
-    borderRadius: 8,
+    borderRadius: radius.sm - 2,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  iconWallet: {
-    backgroundColor: colors.primaryTint,
-  },
-  iconNavy: {
-    backgroundColor: colors.navyTint,
-  },
-  iconDanger: {
-    backgroundColor: colors.dangerTint,
   },
   itemContent: {
     flex: 1,
   },
   itemTitle: {
-    ...typography.title,
     fontSize: 13,
+    fontWeight: '600',
+    color: colors.textPrimary,
   },
-  itemSub: {
-    ...typography.labelSm,
+  itemSubtitle: {
+    fontSize: 11,
     color: colors.textSecondary,
+    marginTop: 1,
   },
 });

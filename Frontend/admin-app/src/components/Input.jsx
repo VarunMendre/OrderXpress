@@ -1,6 +1,6 @@
-import React from 'react';
-import { StyleSheet, TextInput, View } from 'react-native';
-import { colors, radius, spacing, typography } from '../theme';
+import React from "react";
+import { StyleSheet, Text, TextInput, View } from "react-native";
+import { colors, radius, spacing, typography } from "../theme";
 
 export default function Input({
   label,
@@ -46,11 +46,11 @@ const styles = StyleSheet.create({
     backgroundColor: colors.input,
     color: colors.textPrimary,
     fontSize: 14,
-    fontFamily: 'Inter_400Regular',
+    fontFamily: "Inter_400Regular",
   },
   multiline: {
     minHeight: 80,
-    textAlignVertical: 'top',
+    textAlignVertical: "top",
   },
   error: {
     ...typography.labelSm,

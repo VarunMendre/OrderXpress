@@ -1,21 +1,28 @@
-import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  useCallback,
+} from "react";
 import {
   api,
   setUnauthorizedHandler,
   restoreSessionCookie,
   clearSessionCookie,
-} from '../api/client';
-import { authApi } from '../api/auth';
+  setAuthToken,
+} from "../api/client";
+import { authApi } from "../api/auth";
 
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
-  const [status, setStatus] = useState('loading'); // loading | signedOut | signedIn
+  const [status, setStatus] = useState("loading"); // loading | signedOut | signedIn
 
   const signOut = useCallback(async () => {
     setUser(null);
-    setStatus('signedOut');
+    setStatus("signedOut");
     await clearSessionCookie();
   }, []);
 
@@ -28,11 +35,11 @@ export function AuthProvider({ children }) {
         const data = await authApi.me();
         if (!mounted) return;
         setUser(data);
-        setStatus('signedIn');
+        setStatus("signedIn");
       } catch {
         await clearSessionCookie();
         if (!mounted) return;
-        setStatus('signedOut');
+        setStatus("signedOut");
       }
     })();
 
@@ -46,18 +53,24 @@ export function AuthProvider({ children }) {
   }, [signOut]);
 
   const login = useCallback(async (email, password) => {
-    await authApi.login({ email, password });
+    const loginData = await authApi.login({ email, password });
+    if (loginData?.tokens?.bearer) {
+      await setAuthToken(loginData.tokens.bearer);
+    }
     const data = await authApi.me();
     setUser(data);
-    setStatus('signedIn');
+    setStatus("signedIn");
     return data;
   }, []);
 
   const register = useCallback(async (payload) => {
-    await authApi.register(payload);
+    const registerData = await authApi.register(payload);
+    if (registerData?.tokens?.bearer) {
+      await setAuthToken(registerData.tokens.bearer);
+    }
     const data = await authApi.me();
     setUser(data);
-    setStatus('signedIn');
+    setStatus("signedIn");
     return data;
   }, []);
 
@@ -79,6 +92,6 @@ export function AuthProvider({ children }) {
 
 export function useAuth() {
   const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error('useAuth must be used inside <AuthProvider>');
+  if (!ctx) throw new Error("useAuth must be used inside <AuthProvider>");
   return ctx;
 }

@@ -1,11 +1,13 @@
-import React from 'react';
-import { ActivityIndicator, Pressable, StyleSheet, Text } from 'react-native';
-import { colors, radius, spacing, typography } from '../theme';
+import React from "react";
+import { ActivityIndicator, Pressable, StyleSheet, Text } from "react-native";
+import { colors, radius, spacing, typography } from "../theme";
 
 export default function Button({
   title,
+  children,
   onPress,
-  variant = 'primary',
+  variant = "primary",
+  size = "md",
   loading = false,
   disabled = false,
   style,
@@ -14,8 +16,21 @@ export default function Button({
   iconName,
   iconSize = 18,
 }) {
-  const isPrimary = variant === 'primary';
+  const isPrimary = variant === "primary";
+  const isSecondary = variant === "secondary";
+  const isOutline = variant === "outline";
+  const isDanger = variant === "danger";
+  const isGhost = variant === "ghost";
   const isDisabled = disabled || loading;
+  const label = title ?? children;
+  const isSmall = size === "sm";
+  const isLarge = size === "lg";
+
+  const textColor = isPrimary || isDanger
+    ? (isDanger ? colors.danger : colors.white)
+    : isOutline
+      ? colors.primary
+      : colors.textPrimary;
 
   return (
     <Pressable
@@ -23,21 +38,32 @@ export default function Button({
       disabled={isDisabled}
       style={({ pressed }) => [
         styles.base,
-        isPrimary ? styles.primary : styles.secondary,
-        (pressed || isDisabled) && (isPrimary ? styles.pressedPrimary : styles.pressedSecondary),
+        isSmall && styles.small,
+        isLarge && styles.large,
+        isPrimary && styles.primary,
+        isSecondary && styles.secondary,
+        isOutline && styles.outline,
+        isDanger && styles.danger,
+        isGhost && styles.ghost,
+        (pressed || isDisabled) && styles.pressed,
         style,
       ]}
     >
       {loading ? (
-        <ActivityIndicator
-          color={isPrimary ? colors.white : colors.textPrimary}
-          size="small"
-        />
+        <ActivityIndicator color={textColor} size="small" />
       ) : (
         <>
-          {Icon && <Icon name={iconProps} size={iconSize} color={isPrimary ? colors.white : colors.accent} />}
-          <Text style={[styles.text, isPrimary ? styles.textPrimaryBtn : styles.textSecondary, textStyle]}>
-            {title}
+          {Icon && (
+            <Icon
+              name={iconName}
+              size={iconSize}
+              color={isPrimary ? colors.white : colors.accent}
+            />
+          )}
+          <Text
+            style={[styles.text, isSmall && styles.textSmall, { color: textColor }, textStyle]}
+          >
+            {label}
           </Text>
         </>
       )}
@@ -50,10 +76,19 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     paddingHorizontal: 16,
     borderRadius: radius.sm,
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexDirection: 'row',
+    alignItems: "center",
+    justifyContent: "center",
+    flexDirection: "row",
     gap: 6,
+  },
+  small: {
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: radius.xs,
+  },
+  large: {
+    paddingVertical: 16,
+    paddingHorizontal: 20,
   },
   primary: {
     backgroundColor: colors.accent,
@@ -63,12 +98,25 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
     backgroundColor: colors.surface,
   },
-  pressedPrimary: { opacity: 0.85 },
-  pressedSecondary: { backgroundColor: colors.surfaceHover },
+  outline: {
+    borderWidth: 1,
+    borderColor: colors.primary,
+    backgroundColor: colors.surface,
+  },
+  danger: {
+    backgroundColor: colors.dangerTint,
+    borderWidth: 1,
+    borderColor: colors.danger,
+  },
+  ghost: {
+    backgroundColor: "transparent",
+  },
+  pressed: { opacity: 0.85 },
   text: {
-    fontFamily: 'Inter_600SemiBold',
+    fontFamily: "Inter_600SemiBold",
     fontSize: 14,
   },
-  textPrimaryBtn: { color: colors.white },
-  textSecondary: { color: colors.textPrimary },
+  textSmall: {
+    fontSize: 12,
+  },
 });

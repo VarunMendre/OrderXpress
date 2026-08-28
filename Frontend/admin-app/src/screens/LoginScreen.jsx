@@ -50,8 +50,8 @@ export default function LoginScreen({ navigation }) {
           <View style={styles.logo}>
             <Text style={styles.logoText}>OX</Text>
           </View>
-          <Text style={styles.title}>QR Menu Admin</Text>
-          <Text style={styles.subtitle}>Sign in to manage your restaurant</Text>
+          <Text style={styles.title}>OrderXpress</Text>
+          <Text style={styles.subtitle}>Sign in to your restaurant dashboard</Text>
 
           <View style={styles.form}>
             <View style={styles.loginInputWrap}>
@@ -62,6 +62,7 @@ export default function LoginScreen({ navigation }) {
                 value={email}
                 onChangeText={setEmail}
                 style={styles.field}
+                inputStyle={styles.loginInput}
               />
               <Input
                 placeholder="Password"
@@ -69,6 +70,7 @@ export default function LoginScreen({ navigation }) {
                 value={password}
                 onChangeText={setPassword}
                 style={styles.field}
+                inputStyle={styles.loginInput}
               />
             </View>
 
@@ -159,6 +161,11 @@ const styles = StyleSheet.create({
   },
   btn: {
     width: '100%',
+  },
+  loginInput: {
+    backgroundColor: colors.surface,
+    borderRadius: radius.md,
+    paddingVertical: 16,
   },
   divider: {
     flexDirection: 'row',

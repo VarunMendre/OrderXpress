@@ -1,5 +1,6 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../theme';
@@ -8,13 +9,34 @@ import OrdersScreen from '../screens/OrdersScreen';
 import MenuScreen from '../screens/MenuScreen';
 import CollectionsScreen from '../screens/CollectionsScreen';
 import SettingsScreen from '../screens/SettingsScreen';
+import QrScreen from '../screens/QrScreen';
+import OrderDetailScreen from '../screens/OrderDetailScreen';
 
 const Tab = createBottomTabNavigator();
+const Stack = createNativeStackNavigator();
+
+function OrdersStack() {
+  return (
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="OrdersList" component={OrdersScreen} />
+      <Stack.Screen name="OrderDetail" component={OrderDetailScreen} />
+    </Stack.Navigator>
+  );
+}
+
+function MenuStack() {
+  return (
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="MenuList" component={MenuScreen} />
+      <Stack.Screen name="Qr" component={QrScreen} />
+    </Stack.Navigator>
+  );
+}
 
 const TABS = [
   { name: 'Home', component: HomeScreen, icon: 'home-outline', iconActive: 'home' },
-  { name: 'Orders', component: OrdersScreen, icon: 'receipt-outline', iconActive: 'receipt' },
-  { name: 'Menu', component: MenuScreen, icon: 'restaurant-outline', iconActive: 'restaurant' },
+  { name: 'Orders', component: OrdersStack, icon: 'receipt-outline', iconActive: 'receipt' },
+  { name: 'Menu', component: MenuStack, icon: 'restaurant-outline', iconActive: 'restaurant' },
   { name: 'Collections', component: CollectionsScreen, icon: 'wallet-outline', iconActive: 'wallet' },
   { name: 'Settings', component: SettingsScreen, icon: 'settings-outline', iconActive: 'settings' },
 ];
